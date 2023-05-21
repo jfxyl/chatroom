@@ -1,7 +1,8 @@
-package route
+package routes
 
 import (
-	"chatroom/internal/middleware"
+	"chatroom/app/http/controllers"
+	"chatroom/app/http/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +13,8 @@ func InitRouter(router *gin.Engine) {
 		userGroup *gin.RouterGroup
 		msgGroup  *gin.RouterGroup
 		roomGroup *gin.RouterGroup
+
+		userController *controllers.UserController
 	)
 	v1Group = router.Group("/v1")
 	wsGroup = v1Group.Group("/ws", middleware.AuthMiddleware())
@@ -19,12 +22,13 @@ func InitRouter(router *gin.Engine) {
 		wsGroup.GET("", nil)
 	}
 	userGroup = v1Group.Group("/users")
+	userController = new(controllers.UserController)
 	{
-		userGroup.POST("/register", nil)                        //用户注册
-		userGroup.POST("/login", nil)                           //用户登录
-		userGroup.POST("/logout", nil)                          //用户登出
-		userGroup.GET("/:id", middleware.AuthMiddleware(), nil) //用户信息
-		userGroup.PUT("/:id", middleware.AuthMiddleware(), nil) //用户信息修改
+		userGroup.POST("/register", userController.Create)                        //用户注册
+		userGroup.POST("/login", userController.Login)                            //用户登录
+		userGroup.POST("/logout", userController.Logout)                          //用户登出
+		userGroup.GET("/:id", middleware.AuthMiddleware(), userController.Info)   //用户信息
+		userGroup.PUT("/:id", middleware.AuthMiddleware(), userController.Update) //用户信息修改
 	}
 	msgGroup = v1Group.Group("/messages", middleware.AuthMiddleware())
 	{
