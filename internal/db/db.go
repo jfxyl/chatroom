@@ -3,13 +3,10 @@ package db
 import (
 	"chatroom/app/models"
 	"chatroom/internal/config"
+	"chatroom/internal/global"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-)
-
-var (
-	G_DB *gorm.DB
 )
 
 func InitDatabase() (err error) {
@@ -23,13 +20,13 @@ func InitDatabase() (err error) {
 		config.G_Config.Mysql.Port,
 		config.G_Config.Mysql.Database,
 	)
-	G_DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+	global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {
 		return err
 	}
-	err = G_DB.AutoMigrate(
+	err = global.DB.AutoMigrate(
 		&models.User{},
 		&models.Room{},
 		&models.UserRoom{},

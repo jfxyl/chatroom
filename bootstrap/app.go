@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"chatroom/internal/config"
 	"chatroom/internal/db"
-	"chatroom/internal/mq"
 )
 
 func BootStrap() (err error) {
@@ -16,8 +15,8 @@ func BootStrap() (err error) {
 		return
 	}
 	//初始化rocketmq
-	if err = mq.InitMQ(); err != nil {
-		return
-	}
+	//if err = mq.InitMQ(); err != nil {
+	//	return
+	//}
 	return
 }
