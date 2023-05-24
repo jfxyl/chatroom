@@ -6,6 +6,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+type jwtConfig struct {
+	Expiration int    `mapstructure:"expiration"`
+	Secret     string `mapstructure:"secret"`
+}
+
 type mysqlConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
@@ -20,6 +25,7 @@ type rocketmqConfig struct {
 
 type config struct {
 	Name     string         `mapstructure:"name"`
+	Jwt      jwtConfig      `mapstructure:"jwt"`
 	Mysql    mysqlConfig    `mapstructure:"mysql"`
 	Rocketmq rocketmqConfig `mapstructure:"db"`
 }

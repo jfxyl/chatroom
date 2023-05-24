@@ -15,11 +15,19 @@ func RespFail(c *gin.Context, status int, msg any) {
 	Resp(c, status, 1, nil, msg)
 }
 
-func RespErrs(c *gin.Context, status int, errs map[string]string) {
-	Resp(c, status, 1, nil, "")
+func RespAbort(c *gin.Context, status int, msg any) {
+	c.Abort()
+	Resp(c, status, 1, nil, msg)
 }
 
+//c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+//	"message": "Invalid token",
+//})
 func Resp(c *gin.Context, status int, errcode int, data any, msg any) {
+	switch v := msg.(type) {
+	case error:
+		msg = v.Error()
+	}
 	c.JSON(status, gin.H{
 		"errcode": errcode,
 		"data":    data,

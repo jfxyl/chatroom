@@ -1,5 +1,8 @@
 name: chatroom
 port: 3333
+jwt:
+  expiration: 7200000
+  secret: 9099ecd30d0d632ad53be21f8b4f2ff56d074d3e3caee640652f313fe35e0a35
 mysql:
   host: 127.0.0.1
   port: 3306
