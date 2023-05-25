@@ -23,6 +23,7 @@ type User struct {
 	Birthday *time.Time `gorm:"column:birthday;" json:"birthday"`
 	Password string     `gorm:"column:password;type:varchar(100);not null;" json:"-"`
 
+	Rooms []*Room `gorm:"many2many:user_rooms;"`
 	base.BaseTimeModel
 }
 
@@ -78,10 +79,11 @@ func (m *User) GenerateJWT() (string, error) {
 		tokenString string
 	)
 	token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iss":  config.G_Config.Name,
-		"exp":  time.Now().Add(time.Duration(config.G_Config.Jwt.Expiration) * time.Second).Unix(),
-		"iat":  time.Now().Unix(),
-		"user": m.Transform(),
+		"iss":    config.G_Config.Name,
+		"exp":    time.Now().Add(time.Duration(config.G_Config.Jwt.Expiration) * time.Second).Unix(),
+		"iat":    time.Now().Unix(),
+		"userID": m.ID,
+		"user":   m.Transform(),
 	})
 	tokenString, err = token.SignedString([]byte(config.G_Config.Jwt.Secret))
 	return tokenString, err

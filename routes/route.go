@@ -14,6 +14,7 @@ func InitRouter(router *gin.Engine) {
 		msgGroup  *gin.RouterGroup
 		roomGroup *gin.RouterGroup
 
+		roomController *controllers.RoomController
 		userController *controllers.UserController
 	)
 	v1Group = router.Group("/v1")
@@ -24,11 +25,12 @@ func InitRouter(router *gin.Engine) {
 	userGroup = v1Group.Group("/users")
 	userController = new(controllers.UserController)
 	{
-		userGroup.POST("/register", userController.Create)                        //用户注册
-		userGroup.POST("/login", userController.Login)                            //用户登录
-		userGroup.POST("/logout", userController.Logout)                          //用户登出
-		userGroup.GET("/:id", middleware.AuthMiddleware(), userController.Info)   //用户信息
-		userGroup.PUT("/:id", middleware.AuthMiddleware(), userController.Update) //用户信息修改
+		userGroup.POST("/register", userController.Create)                      //用户注册
+		userGroup.POST("/login", userController.Login)                          //用户登录
+		userGroup.POST("/logout", userController.Logout)                        //用户登出
+		userGroup.GET("", middleware.AuthMiddleware(), userController.Info)     //用户信息
+		userGroup.GET("/:id", middleware.AuthMiddleware(), userController.Info) //用户信息
+		userGroup.PUT("", middleware.AuthMiddleware(), userController.Update)   //用户信息修改
 	}
 	msgGroup = v1Group.Group("/messages", middleware.AuthMiddleware())
 	{
@@ -37,14 +39,15 @@ func InitRouter(router *gin.Engine) {
 		msgGroup.GET("/:id/read", nil)  //查看已读状态
 	}
 	roomGroup = v1Group.Group("/rooms", middleware.AuthMiddleware())
+	roomController = new(controllers.RoomController)
 	{
-		roomGroup.GET("", nil)             //用户拥有的聊天室
-		roomGroup.POST("", nil)            //创建聊天室
-		roomGroup.PUT("/:id", nil)         //修改聊天室
-		roomGroup.GET("/:id", nil)         //聊天室信息
-		roomGroup.GET("/:id/records", nil) //聊天室聊天记录
-		roomGroup.POST("/:id/quit", nil)   //退出聊天室
-		roomGroup.DELETE("/:id", nil)      //删除聊天室
-		roomGroup.DELETE("/:id/join", nil) //加入聊天室
+		roomGroup.GET("", roomController.List)          //用户拥有的聊天室
+		roomGroup.POST("", roomController.Create)       //创建聊天室
+		roomGroup.PUT("/:id", nil)                      //修改聊天室
+		roomGroup.GET("/:id", nil)                      //聊天室信息
+		roomGroup.GET("/:id/records", nil)              //聊天室聊天记录
+		roomGroup.POST("/:id/quit", nil)                //退出聊天室
+		roomGroup.DELETE("/:id", roomController.Detele) //删除聊天室
+		roomGroup.DELETE("/:id/join", nil)              //加入聊天室
 	}
 }

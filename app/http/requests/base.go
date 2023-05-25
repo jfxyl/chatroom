@@ -30,6 +30,25 @@ func init() {
 		return nil
 	})
 
+	govalidator.AddCustomRule("softdel_not_exists", func(field string, rule string, message string, value interface{}) error {
+		rng := strings.Split(strings.TrimPrefix(rule, "softdel_not_exists:"), ",")
+
+		tableName := rng[0]
+		dbFiled := rng[1]
+		val := value.(string)
+
+		var count int64
+		global.DB.Table(tableName).Where(dbFiled+" = ?", val).Where("deleted_at IS NULL").Count(&count)
+
+		if count != 0 {
+			if message != "" {
+				return errors.New(message)
+			}
+			return fmt.Errorf("%v 已被占用", val)
+		}
+		return nil
+	})
+
 	// max_cn:8
 	govalidator.AddCustomRule("max_cn", func(field string, rule string, message string, value interface{}) error {
 		valLength := utf8.RuneCountInString(value.(string))

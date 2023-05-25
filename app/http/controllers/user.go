@@ -3,6 +3,7 @@ package controllers
 import (
 	"chatroom/app/http/requests"
 	"chatroom/app/models"
+	"chatroom/internal/auth"
 	"chatroom/internal/common"
 	"chatroom/internal/global"
 	"fmt"
@@ -47,7 +48,6 @@ func (o *UserController) Create(c *gin.Context) {
 }
 
 func (o *UserController) Login(c *gin.Context) {
-	fmt.Println("ssssss")
 	var (
 		err   error
 		errs  map[string]string
@@ -100,19 +100,23 @@ func (o *UserController) Info(c *gin.Context) {
 		user  models.User
 	)
 	idStr = c.Param("id")
-	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-		common.RespFail(c, http.StatusBadRequest, err.Error())
-		return
+	if idStr != "" {
+		if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
+			common.RespFail(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		if err = global.DB.Limit(1).Find(&user, id).Error; err != nil {
+			common.RespFail(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if user.ID == 0 {
+			common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
+			return
+		}
+		common.RespOk(c, user.Transform())
+	} else {
+		common.RespOk(c, auth.User(c).Transform())
 	}
-	if err = global.DB.Limit(1).Find(&user, id).Error; err != nil {
-		common.RespFail(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-	if user.ID == 0 {
-		common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
-		return
-	}
-	common.RespOk(c, user.Transform())
 }
 
 func (o *UserController) Update(c *gin.Context) {

@@ -8,10 +8,10 @@ type UserRoom struct {
 	base.BaseIDModel
 
 	UserID uint64 `gorm:"column:user_id;uniqueIndex:index_user_room;not null;"`
-	User   User
+	User   *User
 
 	RoomID uint64 `gorm:"column:room_id;uniqueIndex:index_user_room;not null;"`
-	Room   Room
+	Room   *Room
 
-	base.BaseCreatedAtModel
+	//base.BaseCreatedAtModel
 }

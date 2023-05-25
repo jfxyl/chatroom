@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"chatroom/internal/auth"
 	"chatroom/internal/common"
 	"chatroom/internal/config"
 	"github.com/gin-gonic/gin"
@@ -37,8 +38,11 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		// 存储用户信息
-		user := claims["user"].(map[string]any)
-		c.Set("userID", user["id"])
+		userID := int(claims["userID"].(float64))
+		c.Set("userID", userID)
+		c.Set("authInfo", &auth.Info{
+			UserID: userID,
+		})
 		c.Next()
 	}
 }
