@@ -4,26 +4,28 @@ import (
 	"chatroom/app/http/requests"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 func RespOk(c *gin.Context, data any) {
-	Resp(c, http.StatusOK, 0, data, "success")
+	Resp(c, http.StatusOK, StatusOK, data, "success")
 }
 
-func RespFail(c *gin.Context, status int, msg any) {
-	Resp(c, status, 1, nil, msg)
+func RespFail(c *gin.Context, errcode ErrCode, msg any) {
+	Resp(c, http.StatusOK, errcode, nil, msg)
 }
 
-func RespAbort(c *gin.Context, status int, msg any) {
+func RespAbort(c *gin.Context, errcode ErrCode, msg any) {
 	c.Abort()
-	Resp(c, status, 1, nil, msg)
+	Resp(c, http.StatusOK, errcode, nil, msg)
 }
 
 //c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 //	"message": "Invalid token",
 //})
-func Resp(c *gin.Context, status int, errcode int, data any, msg any) {
+func Resp(c *gin.Context, status int, errcode ErrCode, data any, msg any) {
 	switch v := msg.(type) {
 	case error:
 		msg = v.Error()
@@ -57,6 +59,23 @@ func SimplifyError(errsMapping map[string][]string) map[string]string {
 	}
 	return nil
 }
+
+//随机生成指定长度的字符串
+func RandString(l int) string {
+	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	bytes := []byte(str)
+	result := []byte{}
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < l; i++ {
+		result = append(result, bytes[rand.Intn(len(bytes))])
+		//result = append(result, bytes[1])
+	}
+	return string(result)
+}
+
+//func RandString(){
+//
+//}
 
 func JsonReqValidate(c *gin.Context, form requests.RegisterForm) any {
 	var (

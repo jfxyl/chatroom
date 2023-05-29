@@ -4,8 +4,8 @@
     <div class="center">
       <div class="center-container">
         <div class="left-container">
-          <div class="title">在线化办公</div>
-          <span class="sub_title">多人协作，打造高效办公方式</span>
+          <div class="title">来聊天吧</div>
+          <span class="sub_title">可爱的人儿呢</span>
           <img class="intro-image" src="https://web.rentsoft.cn/static/media/login_bg.e42640a5.png">
         </div>
         <LoginPanel v-if="action == 'login'" @jump="action = $event"></LoginPanel>

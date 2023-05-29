@@ -7,7 +7,6 @@ import (
 	"chatroom/internal/common"
 	"chatroom/internal/global"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"strconv"
 )
 
@@ -22,11 +21,11 @@ func (o *RoomController) Create(c *gin.Context) {
 		room models.Room
 	)
 	if err = c.ShouldBindJSON(&form); err != nil {
-		common.RespFail(c, http.StatusBadRequest, err)
+		common.RespFail(c, common.StatusInvalidArgument, err)
 		return
 	}
 	if errs = common.SimplifyError(requests.ValidateCreateRoomForm(form)); errs != nil && len(errs) > 0 {
-		common.RespFail(c, http.StatusBadRequest, errs)
+		common.RespFail(c, common.StatusInvalidArgument, errs)
 		return
 	}
 	room = models.Room{
@@ -36,7 +35,7 @@ func (o *RoomController) Create(c *gin.Context) {
 		Users:    []*models.User{auth.User(c)},
 	}
 	if global.DB.Create(&room).Error != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	common.RespOk(c, room.Transform())
@@ -49,7 +48,7 @@ func (o *RoomController) List(c *gin.Context) {
 		transformRooms []map[string]any
 	)
 	if global.DB.Model(auth.User(c)).Association("Rooms").Find(&rooms) != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	for _, room = range rooms {
@@ -67,24 +66,24 @@ func (o *RoomController) Delete(c *gin.Context) {
 	)
 	idStr = c.Param("id")
 	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-		common.RespFail(c, http.StatusBadRequest, err.Error())
+		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 		return
 	}
 	if err = global.DB.Limit(1).Find(&room, id).Error; err != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	if room.ID == 0 {
-		common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
+		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
 		return
 	}
 	if room.Owner != auth.User(c).ID {
-		common.RespFail(c, http.StatusNotFound, common.ERR_FORBIDDEN)
+		common.RespFail(c, common.StatusForbidden, common.ERR_FORBIDDEN)
 		return
 	}
 	//暂时保留用户和房间的关联关系，但用户不可访问该聊天室
 	if global.DB.Delete(&room).Error != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	common.RespOk(c, nil)
@@ -99,15 +98,15 @@ func (o *RoomController) Info(c *gin.Context) {
 	)
 	idStr = c.Param("id")
 	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-		common.RespFail(c, http.StatusBadRequest, err.Error())
+		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 		return
 	}
 	if err = global.DB.Limit(1).Find(&room, id).Error; err != nil {
-		common.RespFail(c, http.StatusInternalServerError, err.Error())
+		common.RespFail(c, common.StatusInternal, err.Error())
 		return
 	}
 	if room.ID == 0 {
-		common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
+		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
 		return
 	}
 	common.RespOk(c, room.Transform())
@@ -123,19 +122,19 @@ func (o *RoomController) Join(c *gin.Context) {
 	)
 	idStr = c.Param("id")
 	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-		common.RespFail(c, http.StatusBadRequest, err.Error())
+		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 		return
 	}
 	if err = global.DB.Limit(1).Find(&room, id).Error; err != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	if room.ID == 0 {
-		common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
+		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
 		return
 	}
 	if global.DB.Model(auth.User(c)).Association("Rooms").Append(&room) != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	common.RespOk(c, nil)
@@ -151,23 +150,23 @@ func (o *RoomController) Quit(c *gin.Context) {
 	)
 	idStr = c.Param("id")
 	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-		common.RespFail(c, http.StatusBadRequest, err.Error())
+		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 		return
 	}
 	if err = global.DB.Limit(1).Find(&room, id).Error; err != nil {
-		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 		return
 	}
 	if room.ID == 0 {
-		common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
+		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
 		return
 	}
 	if room.Owner == auth.User(c).ID {
-		common.RespFail(c, http.StatusBadRequest, "房主暂不支持退出聊天室")
+		common.RespFail(c, common.StatusInvalidArgument, "房主暂不支持退出聊天室")
 		return
 	}
 	if global.DB.Model(auth.User(c)).Association("Rooms").Delete(room) != nil {
-		common.RespFail(c, http.StatusInternalServerError, err.Error())
+		common.RespFail(c, common.StatusInternal, err.Error())
 		return
 	}
 	common.RespOk(c, nil)
@@ -184,23 +183,23 @@ func (o *RoomController) Update(c *gin.Context) {
 	//	)
 	//	idStr = c.Param("id")
 	//	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-	//		common.RespFail(c, http.StatusBadRequest, err.Error())
+	//		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 	//		return
 	//	}
 	//	if err = global.DB.Limit(1).Find(&user, id).Error; err != nil {
-	//		common.RespFail(c, http.StatusInternalServerError, err.Error())
+	//		common.RespFail(c, common.StatusInternal, err.Error())
 	//		return
 	//	}
 	//	if user.ID == 0 {
-	//		common.RespFail(c, http.StatusNotFound, common.ERR_NOT_FOUND)
+	//		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
 	//		return
 	//	}
 	//	if err = c.ShouldBindJSON(&form); err != nil {
-	//		common.RespFail(c, http.StatusBadRequest, err)
+	//		common.RespFail(c, common.StatusInvalidArgument, err)
 	//		return
 	//	}
 	//	if errs = common.SimplifyError(requests.ValidateUserForm(form)); errs != nil && len(errs) > 0 {
-	//		common.RespFail(c, http.StatusBadRequest, errs)
+	//		common.RespFail(c, common.StatusInvalidArgument, errs)
 	//		return
 	//	}
 	//	birthday, _ := time.Parse("2006-01-02", form.Birthday)
@@ -213,7 +212,7 @@ func (o *RoomController) Update(c *gin.Context) {
 	//		Password: form.Password,
 	//	}
 	//	if global.DB.Save(&user).Error != nil {
-	//		common.RespFail(c, http.StatusInternalServerError, common.ERR_INTERNAL_SERVER)
+	//		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 	//		return
 	//	}
 	//	common.RespOk(c, user.Transform())

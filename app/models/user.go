@@ -44,13 +44,17 @@ func (m *User) CheckPassword(password string) bool {
 }
 
 func (m *User) Transform() map[string]any {
+	var birthday = ""
+	if m.Birthday != nil {
+		birthday = m.Birthday.Format("2006-01-02")
+	}
 	return map[string]any{
 		"id":         m.ID,
 		"name":       m.Name,
 		"nickname":   m.Nickname,
 		"gender":     m.Gender,
 		"avatar":     m.Avatar,
-		"birthday":   m.Birthday.Format("2006-01-02"),
+		"birthday":   birthday,
 		"created_at": m.CreatedAt.Format("2006-01-02 15:04:05"),
 		"updated_at": m.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}

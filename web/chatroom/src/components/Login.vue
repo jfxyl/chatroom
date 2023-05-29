@@ -29,9 +29,10 @@
       </a-form-item>
     </a-form>
     <div class="access_bottom">
-      <a-button type="link">
-        忘记密码
-      </a-button>
+<!--      <a-button type="link">-->
+<!--        忘记密码-->
+<!--      </a-button>-->
+      <span></span>
       <a-button type="link" @click="$emit('jump', 'register')">
         立即注册
       </a-button>
@@ -40,7 +41,8 @@
 </template>
 
 <script>
-import { Form,  Input, Button } from 'ant-design-vue';
+import { Form,  Input, Button,message  } from 'ant-design-vue';
+import {formErrorPrompt} from '../utils/utils.js';
 
 export default {
   name: 'LoginPanel',
@@ -61,17 +63,15 @@ export default {
       this.form.validateFields((err, form) => {
         if (!err) {
           let that = this
-          console.log('Received values of form: ', form);
-          console.log(that._const.API_URL+'/v1/users/login')
           that.$http.post('/v1/users/login',form)
           .then(function(data){
-            console.log(data)
-            // that.$layer.msg(data.data.msg,{
-            //   time:2
-            // });
-            // if(data.data.code === 1000){
-            //   that.$emit('closeAddFriend',false)
-            // }
+            if(data.data.errcode !== 0){
+              formErrorPrompt(that.form,form,data.data.msg)
+            }else{
+              localStorage.setItem('token','Bearer '+data.data.data.jwt.token)
+              localStorage.setItem('expired_at',data.data.data.jwt.expired_at * 1000)
+              message.success('登录成功');
+            }
           })
         }
       });

@@ -3,6 +3,7 @@ package routes
 import (
 	"chatroom/app/http/controllers"
 	"chatroom/app/http/middleware"
+	"chatroom/internal/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -50,4 +51,13 @@ func InitRouter(router *gin.Engine) {
 		roomGroup.DELETE("/:id", roomController.Delete)    //删除聊天室
 		roomGroup.DELETE("/:id/join", roomController.Join) //加入聊天室
 	}
+	router.NoRoute(func(c *gin.Context) {
+		acceptHeader := c.GetHeader("Accept")
+		if acceptHeader == "application/json" {
+			common.RespAbort(c, common.StatusNotFound, common.ERR_NOT_FOUND)
+		} else {
+			c.String(404, "404!!!")
+		}
+		return
+	})
 }

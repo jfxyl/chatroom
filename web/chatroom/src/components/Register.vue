@@ -7,6 +7,7 @@
     <a-form :form="form" layout="vertical" @submit="handleSubmit">
       <a-form-item label="用户名">
         <a-input
+            class="ant-input-sm"
             placeholder="请输入用户名"
             allow-clear
             v-decorator="[
@@ -17,6 +18,7 @@
       </a-form-item>
       <a-form-item label="密码">
         <a-input
+            class="ant-input-sm"
             placeholder="请输入密码"
             type="password"
             allow-clear
@@ -28,6 +30,7 @@
       </a-form-item>
       <a-form-item label="确认密码">
         <a-input
+            class="ant-input-sm"
             placeholder="请输入密码"
             type="password"
             allow-clear
@@ -49,7 +52,8 @@
 </template>
 
 <script>
-import { Form,  Input, Button } from 'ant-design-vue';
+import {Form, Input, Button, message} from 'ant-design-vue';
+import {formErrorPrompt} from '../utils/utils.js';
 export default {
   name: 'RegisterPanel',
   components:{
@@ -74,10 +78,18 @@ export default {
     },
     handleSubmit(e) {
       e.preventDefault();
-      this.form.validateFields((err, values) => {
+      this.form.validateFields((err, form) => {
         if (!err) {
-          console.log('Received values of form: ', values);
-
+          let that = this
+          console.log('Received values of form: ', form);
+          that.$http.post('/v1/users/register',form)
+              .then(function(data){
+                if(data.data.errcode !== 0){
+                  formErrorPrompt(that.form,form,data.data.msg)
+                }else{
+                  message.success('注册成功');
+                }
+              })
         }
       });
       // this.$router.push('/chatroom');
@@ -100,7 +112,7 @@ export default {
     padding-bottom: 24px;
   }
   .ant-form-item{
-    margin-bottom: 15px;
+    //margin-bottom: 15px;
   }
   .back{
     position: absolute;

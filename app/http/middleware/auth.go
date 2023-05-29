@@ -6,7 +6,6 @@ import (
 	"chatroom/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"net/http"
 	"strings"
 )
 
@@ -21,7 +20,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		authorization = c.GetHeader("Authorization")
 		authorization = strings.TrimPrefix(authorization, "Bearer ")
 		if authorization == "" {
-			common.RespAbort(c, http.StatusUnauthorized, common.ERR_UNAUTHORIZED)
+			common.RespAbort(c, common.StatusUnauthorized, common.ERR_UNAUTHORIZED)
 			return
 		}
 		// 解析 JWT
@@ -29,12 +28,12 @@ func AuthMiddleware() gin.HandlerFunc {
 			return []byte(config.G_Config.Jwt.Secret), nil
 		})
 		if err != nil {
-			common.RespAbort(c, http.StatusUnauthorized, common.ERR_UNAUTHORIZED)
+			common.RespAbort(c, common.StatusUnauthorized, common.ERR_UNAUTHORIZED)
 			return
 		}
 		// 验证 JWT 是否有效
 		if claims, ok = token.Claims.(jwt.MapClaims); !(ok && token.Valid) {
-			common.RespAbort(c, http.StatusUnauthorized, common.ERR_UNAUTHORIZED)
+			common.RespAbort(c, common.StatusUnauthorized, common.ERR_UNAUTHORIZED)
 			return
 		}
 		// 存储用户信息
