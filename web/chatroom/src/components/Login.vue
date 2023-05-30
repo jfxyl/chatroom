@@ -29,10 +29,6 @@
       </a-form-item>
     </a-form>
     <div class="access_bottom">
-<!--      <a-button type="link">-->
-<!--        忘记密码-->
-<!--      </a-button>-->
-      <span></span>
       <a-button type="link" @click="$emit('jump', 'register')">
         立即注册
       </a-button>
@@ -98,6 +94,7 @@ export default {
     font-size: 12px;
     margin-top: 4px;
     display: flex;
+    flex-direction: row-reverse;
     justify-content: space-between;
   }
 }
