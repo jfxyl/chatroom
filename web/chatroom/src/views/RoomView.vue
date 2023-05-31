@@ -1,33 +1,31 @@
 <template>
-  <div class="container">
-
+  <div className="container">
+    <RoomsPanel></RoomsPanel>
   </div>
 </template>
 
 <script>
-// import RegisterPanel from '@/components/Register.vue'
+import RoomsPanel from '@/components/Rooms.vue'
 // import { Icon  } from 'ant-design-vue';
 export default {
-  name: 'FriendView',
-  components:{
-    // 'a-icon':Icon
+  name: 'RoomView',
+  components: {
+    RoomsPanel
   },
-  computed: {
-
+  computed: {},
+  mounted:function() {
+    this.$store.dispatch('SET_CURRENT_MENU', 'room')
   },
-  methods: {
-
-  },
-  data(){
-    return{
-    }
+  methods: {},
+  data() {
+    return {}
   },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.container{
+.container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;

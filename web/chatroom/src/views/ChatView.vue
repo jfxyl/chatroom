@@ -15,6 +15,9 @@ export default {
   computed: {
 
   },
+  mounted:function() {
+    this.$store.dispatch('SET_CURRENT_MENU', 'chat')
+  },
   methods: {
 
   },

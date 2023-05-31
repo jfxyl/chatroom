@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import userModule from './modules/User'
+// import chatModule from './modules/Chat'
+import roomModule from './modules/Room'
+import menuModule from './modules/Menu'
 
 Vue.use(Vuex)
 
@@ -13,5 +17,9 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+    user: userModule,
+    // chat: chatModule,
+    room: roomModule,
+    menu: menuModule,
   }
 })

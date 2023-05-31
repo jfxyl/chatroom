@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import ChatView from '../views/ChatView.vue'
+import RoomView from '../views/RoomView.vue'
+import LoginView from '../views/LoginView.vue'
+import AboutView from '../views/AboutView.vue'
 
 Vue.use(VueRouter)
 
@@ -8,7 +12,13 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    children:[
+      {
+        path:'',
+        component:  ChatView,
+      }
+    ]
   },
   {
     path: '/about',
@@ -16,7 +26,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    component: AboutView
   },
   {
     path: '/login',
@@ -24,39 +34,37 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue')
+    component: LoginView
   },
   {
     path: '/chat',
     name: 'chat',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/HomeView.vue'),
+    component: HomeView,
     children:[
       {
         path:'',
-        component:  () => import(/* webpackChunkName: "about" */ '../views/ChatView.vue'),
+        component:  ChatView,
       }
     ]
   },
   {
-    path: '/friend',
-    name: 'friend',
+    path: '/room',
+    name: 'room',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/HomeView.vue'),
+    component: HomeView,
     children:[
       {
         path:'',
-        component:  () => import(/* webpackChunkName: "about" */ '../views/FriendView.vue'),
+        component:  RoomView,
       }
     ]
   }
 ]
 
 const router = new VueRouter({
+  mode:'history',
   routes
 })
 

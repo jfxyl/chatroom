@@ -64,9 +64,10 @@ export default {
             if(data.data.errcode !== 0){
               formErrorPrompt(that.form,form,data.data.msg)
             }else{
-              localStorage.setItem('token','Bearer '+data.data.data.jwt.token)
-              localStorage.setItem('expired_at',data.data.data.jwt.expired_at * 1000)
+              that.$store.dispatch('LOGIN',data.data.data.user)
+              that.$store.dispatch('REFRESH_TOKEN',data.data.data.jwt)
               message.success('登录成功');
+              that.$router.push('/');
             }
           })
         }

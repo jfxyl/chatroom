@@ -35,7 +35,9 @@ new Vue({
     this.$http.interceptors.response.use((response) => {
       // console.log('响应拦截器')
       if(response.data.errcode == 1){
-        this.$router.push('/login');
+        if(this.$route.path !== '/login'){
+          this.$router.push('/login');
+        }
       }else if(response.headers.authorization){
         // 如果 header 中存在 token，那么触发 refreshToken 方法，替换本地的 token
         // this.$store.dispatch('REFRESH_TOKEN', response.headers.authorization)

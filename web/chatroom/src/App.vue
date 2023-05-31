@@ -1,14 +1,46 @@
 <template>
   <div id="app">
     <router-view></router-view>
-<!--    <nav>-->
-<!--      <router-link to="/">Home</router-link> |-->
-<!--      <router-link to="/about">About</router-link>-->
-<!--      <router-link to="/register">About</router-link>-->
-<!--    </nav>-->
-<!--    <router-view/>-->
   </div>
 </template>
+
+<script>
+import {message} from "ant-design-vue";
+
+export default {
+  data(){
+    return{
+    }
+  },
+  created() {
+    var that = this
+    that.$http.get('/v1/users')
+      .then(function(data){
+        if(data.data.errcode !== 0){
+          message.error(data.data.msg);
+          if(that.$route.path !== '/login' || that.$route.path !== '/Login'){
+            that.$router.push('/login');
+          }
+        }else{
+          that.$store.dispatch('LOGIN',data.data.data)
+          that.$store.dispatch('GET_ROOMS')
+          if(that.$route.path === '/login' || that.$route.path === '/Login'){
+            that.$router.push('/');
+          }
+        }
+      })
+  },
+  methods:{
+
+  },
+  computed:{
+
+  },
+  watch:{
+
+  }
+}
+</script>
 
 <style>
 *{

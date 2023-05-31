@@ -13,10 +13,10 @@
             </svg>
           </router-link>
         </div>
-        <div class="menu-item" @click="setMenu('friend')">
-          <router-link to="/friend">
+        <div class="menu-item" @click="setMenu('room')">
+          <router-link to="/room">
             <svg class="icon" aria-hidden="true">
-              <use :xlink:href="currentMenu == 'friend'?'#icon-friends_active':'#icon-friends'"></use>
+              <use :xlink:href="currentMenu == 'room'?'#icon-friends_active':'#icon-friends'"></use>
             </svg>
           </router-link>
         </div>
@@ -29,26 +29,23 @@
 </template>
 
 <script>
-// import RegisterPanel from '@/components/Register.vue'
-// import { Icon  } from 'ant-design-vue';
 export default {
   name: 'HomeView',
   components:{
     // 'a-icon':Icon
   },
   computed: {
-
+    currentMenu(){
+      return this.$store.state.menu.currentMenu
+    },
   },
   methods: {
     setMenu(menu){
-      console.log(menu)
-      this.currentMenu = menu
-      // this.$store.dispatch('SET_CURRENT_MENU',menu)
+      this.$store.dispatch('SET_CURRENT_MENU',menu)
     }
   },
   data(){
     return{
-      currentMenu: 'chat',
     }
   },
 }
