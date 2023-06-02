@@ -57,7 +57,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+  height: 100%;
   .top{
     display: flex;
     align-items: center;
@@ -106,7 +106,8 @@ export default {
     }
     .right-container{
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      flex:1;
     }
   }
 }

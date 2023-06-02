@@ -1,25 +1,34 @@
 <template>
   <div class="rooms">
-    <div class="room" v-for="(room,name,index) in rooms" :key="index">
-      <div class="avatar">
-        <img class="img" :src="room.avatar" alt="">
-      </div>
-      <div class="info" >
-        <div class="top">
-          <div class="name">{{room.name}}</div>
+    <a-dropdown class="room" v-for="(room,name,index) in rooms" :key="index" :trigger="['contextmenu']" >
+      <div @click="current(room)" :class="{active:currentRoom.id === room.id}">
+        <div class="avatar">
+          <img class="img" :src="room.avatar" alt="">
         </div>
-        <div class="bottom">1000人</div>
+        <div class="info" >
+          <div class="top">{{room.name}}</div>
+<!--          <div class="bottom">1000人</div>-->
+        </div>
       </div>
-    </div>
+      <a-menu slot="overlay">
+        <a-menu-item key="1" @click="toChat(room)">发消息</a-menu-item>
+        <a-menu-item key="2" @click="setAlias(room)">备注设置</a-menu-item>
+        <a-menu-divider />
+        <a-menu-item key="3" @click="quitRoom(room)">退出聊天室</a-menu-item>
+      </a-menu>
+    </a-dropdown>
   </div>
 </template>
 
 <script>
-
+import { Menu,Dropdown  } from 'ant-design-vue';
 export default {
   name: 'RoomsPanel',
   components:{
-
+    'a-menu':Menu,
+    'a-menu-item':Menu.Item,
+    'a-menu-divider':Menu.Divider,
+    'a-dropdown':Dropdown,
   },
   data(){
     return{
@@ -30,9 +39,23 @@ export default {
     rooms() {
       return this.$store.state.room.rooms
     },
+    currentRoom() {
+      return this.$store.state.room.currentRoom
+    },
   },
   methods:{
-
+    current(room){
+      this.$store.dispatch('SET_CURRENT_ROOM',room)
+    },
+    toChat(room){
+      console.log(room)
+    },
+    setAlias(room){
+      console.log(room)
+    },
+    quitRoom(room){
+      console.log(room)
+    }
   }
 }
 </script>
@@ -41,6 +64,14 @@ export default {
 .rooms{
   width:350px;
   padding: 10px;
+  height:100%;
+  max-height: 100%;
+  border-right: 1px solid #ccc;
+  overflow:auto;
+  overflow-x:hidden;
+  .active{
+    background-color: #f3f8fe;
+  }
   .room{
     display: flex;
     align-items: center;
@@ -67,16 +98,9 @@ export default {
       .top{
         display: flex;
         flex-direction: row;
-        .name{
-          font-size: 14px;
-          text-align: left;
-          flex: 1;
-        }
-        .time{
-          text-align: left;
-          font-size: 12px;
-          color: #999;
-        }
+        font-size: 16px;
+        text-align: left;
+        flex: 1;
       }
       .bottom{
         font-size: 12px;

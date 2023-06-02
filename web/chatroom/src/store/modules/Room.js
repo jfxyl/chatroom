@@ -2,11 +2,15 @@ import {message} from "ant-design-vue";
 
 const state = {
     rooms : [],
+    currentRoom:{},
 }
 
 const mutations = {
     SET_ROOMS (state,rooms) {
         state.rooms = rooms
+    },
+    SET_CURRENT_ROOM (state,room) {
+        state.currentRoom = room
     },
 }
 
@@ -27,6 +31,9 @@ const actions = {
     },
     SET_ROOMS(context,rooms){
         context.commit('SET_ROOMS',rooms)
+    },
+    SET_CURRENT_ROOM(context,room){
+        context.commit('SET_CURRENT_ROOM',room)
     },
 }
 
