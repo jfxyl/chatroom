@@ -47,6 +47,8 @@ export default {
 
 <style>
 *{
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 body{
@@ -58,7 +60,7 @@ body{
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-
+  height: 100%;
 }
 
 nav {

@@ -8,7 +8,7 @@
 <script>
 import RoomsPanel from '@/components/Rooms.vue'
 import RoomPanel from '@/components/Room.vue'
-// import { Icon  } from 'ant-design-vue';
+
 export default {
   name: 'RoomView',
   components: {

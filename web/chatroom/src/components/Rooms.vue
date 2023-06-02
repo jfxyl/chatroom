@@ -69,6 +69,19 @@ export default {
   border-right: 1px solid #ccc;
   overflow:auto;
   overflow-x:hidden;
+  cursor: default;
+  &::-webkit-scrollbar {
+    width: 6px; /* 设置滚动条宽度 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2); /* 设置滚动条颜色 */
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4); /* 设置滚动条悬停时的颜色 */
+  }
   .active{
     background-color: #f3f8fe;
   }
