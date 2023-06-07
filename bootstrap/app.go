@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"chatroom/internal/config"
 	"chatroom/internal/db"
+	"chatroom/internal/oss"
 )
 
 func BootStrap() (err error) {
@@ -12,6 +13,10 @@ func BootStrap() (err error) {
 	config.InitConfig()
 	//初始化数据库
 	if err = db.InitDatabase(); err != nil {
+		return
+	}
+	//初始化oss
+	if err = oss.InitOss(); err != nil {
 		return
 	}
 	//初始化rocketmq

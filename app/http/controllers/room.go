@@ -30,6 +30,7 @@ func (o *RoomController) Create(c *gin.Context) {
 	}
 	room = models.Room{
 		Name:     form.Name,
+		Avatar:   form.Avatar,
 		Owner:    auth.User(c).ID,
 		IsPublic: form.IsPublic == 1,
 		Users:    []*models.User{auth.User(c)},

@@ -6,6 +6,10 @@ import axios from 'axios'
 Vue.http = Vue.prototype.$http = axios
 import 'ant-design-vue/dist/antd.css';
 
+import moment from 'moment'
+Vue.prototype.$moment = moment;
+
+
 import _const from './config/config.js'
 Vue.prototype._const = _const
 import utils from './utils/utils.js'

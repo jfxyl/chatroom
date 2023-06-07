@@ -1,7 +1,7 @@
 <template>
   <div v-if="currentRoom.id" class="container">
     <div class="avatar">
-      <img :src="currentRoom.avatar" alt="">
+      <img class="img" :src="currentRoom.avatar" alt="">
     </div>
     <div class="name">{{currentRoom.name}}</div>
     <button class="button" @click="toChat">进入聊天室</button>
@@ -44,6 +44,10 @@ export default {
     height: 100px;
     border-radius: 50%;
     background-color: #ccc;
+    .img{
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .name {

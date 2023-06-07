@@ -14,9 +14,11 @@ func InitRouter(router *gin.Engine) {
 		userGroup *gin.RouterGroup
 		msgGroup  *gin.RouterGroup
 		roomGroup *gin.RouterGroup
+		ossGroup  *gin.RouterGroup
 
 		roomController *controllers.RoomController
 		userController *controllers.UserController
+		ossController  *controllers.OssController
 	)
 	v1Group = router.Group("/v1")
 	wsGroup = v1Group.Group("/ws", middleware.AuthMiddleware())
@@ -42,14 +44,19 @@ func InitRouter(router *gin.Engine) {
 	roomGroup = v1Group.Group("/rooms", middleware.AuthMiddleware())
 	roomController = new(controllers.RoomController)
 	{
-		roomGroup.GET("", roomController.List)             //用户拥有的聊天室
-		roomGroup.POST("", roomController.Create)          //创建聊天室
-		roomGroup.PUT("/:id", nil)                         //修改聊天室
-		roomGroup.GET("/:id", roomController.Info)         //聊天室信息
-		roomGroup.GET("/:id/records", nil)                 //聊天室聊天记录
-		roomGroup.POST("/:id/quit", roomController.Quit)   //退出聊天室
-		roomGroup.DELETE("/:id", roomController.Delete)    //删除聊天室
-		roomGroup.DELETE("/:id/join", roomController.Join) //加入聊天室
+		roomGroup.GET("", roomController.List)           //用户拥有的聊天室
+		roomGroup.POST("", roomController.Create)        //创建聊天室
+		roomGroup.PUT("/:id", nil)                       //修改聊天室
+		roomGroup.GET("/:id", roomController.Info)       //聊天室信息
+		roomGroup.GET("/:id/records", nil)               //聊天室聊天记录
+		roomGroup.POST("/:id/quit", roomController.Quit) //退出聊天室
+		roomGroup.DELETE("/:id", roomController.Delete)  //删除聊天室
+		roomGroup.POST("/:id/join", roomController.Join) //加入聊天室
+	}
+	ossGroup = v1Group.Group("/oss")
+	ossController = new(controllers.OssController)
+	{
+		ossGroup.GET("/signature", ossController.Signature) //oss签名
 	}
 	router.NoRoute(func(c *gin.Context) {
 		acceptHeader := c.GetHeader("Accept")

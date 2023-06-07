@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func InitDatabase() (err error) {
@@ -22,6 +23,7 @@ func InitDatabase() (err error) {
 	)
 	global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger:                                   logger.Default.LogMode(logger.Info), //配置日志级别，打印出所有的sql
 	})
 	if err != nil {
 		return err

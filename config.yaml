@@ -1,0 +1,20 @@
+name: chatroom
+port: 3333
+jwt:
+  expiration: 7200000
+  secret: 9099ecd30d0d632ad53be21f8b4f2ff56d074d3e3caee640652f313fe35e0a35
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  database: chatroom
+  username: root
+  password: 123456
+rocketmq:
+  endpoints:
+    - 127.0.0.1:9876
+oss:
+  entpoint: oss-cn-nanjing.aliyuncs.com
+  bucket_name: jfxy
+  access_key_id: LTAI5tEL8N1KMZ2SL41ABfnj
+  access_key_secret: lQaZPa8LDWEmzArUQCVCK45JyxiLK7
+  prefix_dir: chatroom

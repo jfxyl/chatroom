@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -90,4 +91,21 @@ func JsonReqValidate(c *gin.Context, form requests.RegisterForm) any {
 		return errs
 	}
 	return nil
+}
+
+func GenerateRandomFilename() string {
+	rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%s", RandString(16))
+}
+
+func GetLinkWithoutParams(link string) (string, error) {
+	u, err := url.Parse(link)
+	if err != nil {
+		return "", err
+	}
+
+	u.RawQuery = "" // 清除查询参数部分
+	u.Fragment = "" // 清除片段部分
+
+	return u.String(), nil
 }

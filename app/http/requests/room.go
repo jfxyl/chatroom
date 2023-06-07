@@ -6,6 +6,7 @@ import (
 
 type RoomForm struct {
 	Name     string `form:"name" json:"name" valid:"name"`
+	Avatar   string `form:"avatar" json:"avatar" valid:"avatar"`
 	IsPublic uint8  `form:"is_public" json:"is_public" valid:"is_public"`
 }
 

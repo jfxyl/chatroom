@@ -19,7 +19,7 @@ type User struct {
 	Name     string     `gorm:"column:name;type:varchar(20);not null;" json:"name"`
 	Nickname string     `gorm:"column:nickname;type:varchar(20);not null;" json:"nickname"`
 	Gender   int8       `gorm:"column:gender;not null;default:0;" json:"gender"`
-	Avatar   string     `gorm:"column:avatar;type:varchar(50);not null;" json:"avatar"`
+	Avatar   string     `gorm:"column:avatar;type:varchar(100);not null;" json:"avatar"`
 	Birthday *time.Time `gorm:"column:birthday;" json:"birthday"`
 	Password string     `gorm:"column:password;type:varchar(100);not null;" json:"-"`
 

@@ -23,11 +23,20 @@ type rocketmqConfig struct {
 	Endpoints []string `mapstructure:"endpoints"`
 }
 
+type ossConfig struct {
+	Entpoint        string `mapstructure:"entpoint"`
+	BucketName      string `mapstructure:"bucket_name"`
+	AccessKeyID     string `mapstructure:"access_key_id"`
+	AccessKeySecret string `mapstructure:"access_key_secret"`
+	PrefixDir       string `mapstructure:"prefix_dir"`
+}
+
 type config struct {
 	Name     string         `mapstructure:"name"`
 	Jwt      jwtConfig      `mapstructure:"jwt"`
 	Mysql    mysqlConfig    `mapstructure:"mysql"`
 	Rocketmq rocketmqConfig `mapstructure:"db"`
+	Oss      ossConfig      `mapstructure:"oss"`
 }
 
 var (
