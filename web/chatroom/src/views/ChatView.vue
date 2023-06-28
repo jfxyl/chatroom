@@ -1,16 +1,19 @@
 <template>
   <div class="container">
     <ChatsPanel></ChatsPanel>
+    <ChatPanel></ChatPanel>
   </div>
 </template>
 
 <script>
 import ChatsPanel from '@/components/Chats.vue'
+import ChatPanel from '@/components/Chat.vue'
 // import { Icon  } from 'ant-design-vue';
 export default {
   name: 'ChatView',
   components:{
-    ChatsPanel
+    ChatsPanel,
+    ChatPanel,
   },
   computed: {
 
@@ -32,9 +35,9 @@ export default {
 <style scoped>
 .container{
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   height: 100%;
-
+  flex:1;
 }
 </style>

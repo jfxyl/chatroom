@@ -14,19 +14,31 @@ func InitRouter(router *gin.Engine) {
 		userGroup *gin.RouterGroup
 		msgGroup  *gin.RouterGroup
 		roomGroup *gin.RouterGroup
+		chatGroup *gin.RouterGroup
 		ossGroup  *gin.RouterGroup
 
-		roomController *controllers.RoomController
-		userController *controllers.UserController
-		ossController  *controllers.OssController
+		roomController    *controllers.RoomController
+		chatController    *controllers.ChatController
+		userController    *controllers.UserController
+		ossController     *controllers.OssController
+		wsController      *controllers.WsController
+		messageController *controllers.MessageController
 	)
+
 	v1Group = router.Group("/v1")
 	wsGroup = v1Group.Group("/ws", middleware.AuthMiddleware())
-	{
-		wsGroup.GET("", nil)
-	}
 	userGroup = v1Group.Group("/users")
-	userController = new(controllers.UserController)
+	msgGroup = v1Group.Group("/messages", middleware.AuthMiddleware())
+	roomGroup = v1Group.Group("/rooms", middleware.AuthMiddleware())
+	chatGroup = v1Group.Group("/chats", middleware.AuthMiddleware())
+	ossGroup = v1Group.Group("/oss")
+
+	wsController = controllers.NewWsController()
+	{
+		wsGroup.GET("", wsController.Conn)
+	}
+
+	userController = controllers.NewUserController()
 	{
 		userGroup.POST("/register", userController.Create)                      //用户注册
 		userGroup.POST("/login", userController.Login)                          //用户登录
@@ -35,25 +47,31 @@ func InitRouter(router *gin.Engine) {
 		userGroup.GET("/:id", middleware.AuthMiddleware(), userController.Info) //用户信息
 		userGroup.PUT("", middleware.AuthMiddleware(), userController.Update)   //用户信息修改
 	}
-	msgGroup = v1Group.Group("/messages", middleware.AuthMiddleware())
+
+	messageController = controllers.NewMessageController()
 	{
-		msgGroup.POST("", nil)          //发送消息
-		msgGroup.POST("/:id/read", nil) //发送已读状态
-		msgGroup.GET("/:id/read", nil)  //查看已读状态
+		msgGroup.POST("", messageController.Send)                 //发送消息
+		msgGroup.GET("/:id", messageController.List)              //消息列表
+		msgGroup.GET("/:id/readinfo", messageController.ReadInfo) //查看已读状态
 	}
-	roomGroup = v1Group.Group("/rooms", middleware.AuthMiddleware())
-	roomController = new(controllers.RoomController)
+
+	roomController = controllers.NewRoomController()
 	{
-		roomGroup.GET("", roomController.List)           //用户拥有的聊天室
-		roomGroup.POST("", roomController.Create)        //创建聊天室
-		roomGroup.PUT("/:id", nil)                       //修改聊天室
-		roomGroup.GET("/:id", roomController.Info)       //聊天室信息
-		roomGroup.GET("/:id/records", nil)               //聊天室聊天记录
-		roomGroup.POST("/:id/quit", roomController.Quit) //退出聊天室
-		roomGroup.DELETE("/:id", roomController.Delete)  //删除聊天室
-		roomGroup.POST("/:id/join", roomController.Join) //加入聊天室
+		roomGroup.GET("", roomController.List)                 //用户拥有的聊天室
+		roomGroup.POST("", roomController.Create)              //创建聊天室
+		roomGroup.PUT("/:id", nil)                             //修改聊天室
+		roomGroup.GET("/:id", roomController.Info)             //聊天室信息
+		roomGroup.GET("/:id/messages", messageController.List) //聊天室聊天记录
+		roomGroup.POST("/:id/quit", roomController.Quit)       //退出聊天室
+		roomGroup.DELETE("/:id", roomController.Delete)        //删除聊天室
+		roomGroup.POST("/:id/join", roomController.Join)       //加入聊天室
 	}
-	ossGroup = v1Group.Group("/oss")
+
+	chatController = controllers.NewChatController()
+	{
+		chatGroup.GET("", chatController.List) //oss签名
+	}
+
 	ossController = new(controllers.OssController)
 	{
 		ossGroup.GET("/signature", ossController.Signature) //oss签名

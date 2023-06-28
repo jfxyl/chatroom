@@ -1,7 +1,7 @@
 package requests
 
 import (
-	"chatroom/internal/global"
+	"chatroom/internal/db"
 	"errors"
 	"fmt"
 	"github.com/thedevsaddam/govalidator"
@@ -19,7 +19,7 @@ func init() {
 		val := value.(string)
 
 		var count int64
-		global.DB.Table(tableName).Where(dbFiled+" = ?", val).Count(&count)
+		db.G_DB.Table(tableName).Where(dbFiled+" = ?", val).Count(&count)
 
 		if count != 0 {
 			if message != "" {
@@ -38,7 +38,7 @@ func init() {
 		val := value.(string)
 
 		var count int64
-		global.DB.Table(tableName).Where(dbFiled+" = ?", val).Where("deleted_at IS NULL").Count(&count)
+		db.G_DB.Table(tableName).Where(dbFiled+" = ?", val).Where("deleted_at IS NULL").Count(&count)
 
 		if count != 0 {
 			if message != "" {

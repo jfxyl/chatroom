@@ -2,24 +2,31 @@ package controllers
 
 import (
 	"chatroom/app/http/requests"
+	"chatroom/app/http/services"
 	"chatroom/app/models"
 	"chatroom/internal/auth"
 	"chatroom/internal/common"
-	"chatroom/internal/global"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
 
+func NewUserController() *UserController {
+	return &UserController{
+		UserService: services.NewUserService(),
+	}
+}
+
 type UserController struct {
+	UserService *services.UserService
 }
 
 func (o *UserController) Create(c *gin.Context) {
 	var (
-		err  error
-		errs map[string]string
-		form requests.RegisterForm
-		user models.User
+		err     error
+		codeErr *common.CodeErr
+		errs    map[string]string
+		form    requests.RegisterForm
+		user    *models.User
 	)
 	if err = c.ShouldBindJSON(&form); err != nil {
 		common.RespFail(c, common.StatusInvalidArgument, err)
@@ -29,17 +36,8 @@ func (o *UserController) Create(c *gin.Context) {
 		common.RespFail(c, common.StatusInvalidArgument, errs)
 		return
 	}
-	//birthday, _ := time.Parse("2006-01-02", form.Birthday)
-	user = models.User{
-		Name:     form.Name,
-		Nickname: fmt.Sprintf("用户%s", common.RandString(6)),
-		//Gender:   form.Gender,
-		//Avatar:   form.Avatar,
-		//Birthday: nil,
-		Password: form.Password,
-	}
-	if global.DB.Save(&user).Error != nil {
-		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	if user, codeErr = o.UserService.Create(c, form); codeErr != nil {
+		common.RespFail(c, codeErr.Code, codeErr.Err)
 		return
 	}
 	common.RespOk(c, user.Transform())
@@ -47,42 +45,25 @@ func (o *UserController) Create(c *gin.Context) {
 
 func (o *UserController) Login(c *gin.Context) {
 	var (
-		err   error
-		errs  map[string]string
-		form  requests.LoginForm
-		user  models.User
-		token string
+		err     error
+		errs    map[string]string
+		codeErr *common.CodeErr
+		form    requests.LoginForm
+		user    models.User
+		token   string
 	)
 	if err = c.ShouldBindJSON(&form); err != nil {
 		common.RespFail(c, common.StatusInvalidArgument, err)
 		return
 	}
 	if errs = common.SimplifyError(requests.ValidateLoginForm(form)); errs != nil && len(errs) > 0 {
-		fmt.Println(1)
 		common.RespFail(c, common.StatusInvalidArgument, errs)
 		return
 	}
-	if err = global.DB.Where(map[string]any{"name": form.Name}).Limit(1).Find(&user).Error; err != nil {
-		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	if token, codeErr = o.UserService.Login(c, form); codeErr != nil {
+		common.RespFail(c, codeErr.Code, codeErr.Err)
 		return
 	}
-	fmt.Println(user, user.ID, user.ID == 0)
-	if user.ID == 0 {
-		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
-		return
-	}
-	fmt.Println(form.Password)
-	if !user.CheckPassword(form.Password) {
-		common.RespFail(c, common.StatusInvalidArgument, "密码不正确")
-		return
-	}
-	fmt.Println("token")
-	if token, err = user.GenerateJWT(); err != nil {
-		fmt.Println(err)
-		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
-		return
-	}
-	fmt.Println("token", token)
 	common.RespOk(c, user.LoginTransform(token))
 }
 
@@ -92,10 +73,11 @@ func (o *UserController) Logout(c *gin.Context) {
 
 func (o *UserController) Info(c *gin.Context) {
 	var (
-		err   error
-		idStr string
-		id    uint64
-		user  models.User
+		err     error
+		idStr   string
+		id      uint64
+		codeErr *common.CodeErr
+		user    *models.User
 	)
 	idStr = c.Param("id")
 	if idStr != "" {
@@ -103,12 +85,8 @@ func (o *UserController) Info(c *gin.Context) {
 			common.RespFail(c, common.StatusInvalidArgument, err.Error())
 			return
 		}
-		if err = global.DB.Limit(1).Find(&user, id).Error; err != nil {
-			common.RespFail(c, common.StatusInternal, err.Error())
-			return
-		}
-		if user.ID == 0 {
-			common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
+		if user, codeErr = o.UserService.Info(c, id); codeErr != nil {
+			common.RespFail(c, codeErr.Code, codeErr.Err)
 			return
 		}
 		common.RespOk(c, user.Transform())
@@ -131,7 +109,7 @@ func (o *UserController) Update(c *gin.Context) {
 	//		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 	//		return
 	//	}
-	//	if err = global.DB.Limit(1).Find(&user, id).Error; err != nil {
+	//	if err = db.G_DB.Limit(1).Find(&user, id).Error; err != nil {
 	//		common.RespFail(c, common.StatusInternal, err.Error())
 	//		return
 	//	}
@@ -156,7 +134,7 @@ func (o *UserController) Update(c *gin.Context) {
 	//		Birthday: &birthday,
 	//		Password: form.Password,
 	//	}
-	//	if global.DB.Save(&user).Error != nil {
+	//	if db.G_DB.Save(&user).Error != nil {
 	//		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
 	//		return
 	//	}

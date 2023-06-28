@@ -10,12 +10,18 @@ import moment from 'moment'
 Vue.prototype.$moment = moment;
 
 
-import _const from './config/config.js'
+import _config from './config/config.js'
+Vue.prototype._config = _config
+import _const from './constant/constant.js'
 Vue.prototype._const = _const
 import utils from './utils/utils.js'
 Vue.prototype.utils = utils
 
 Vue.config.productionTip = false
+
+Vue.prototype.globalClick = function (callback) { //页面全局点击
+  document.addEventListener('click',callback);
+}
 
 new Vue({
   router,

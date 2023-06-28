@@ -20,6 +20,7 @@ type mysqlConfig struct {
 }
 
 type rocketmqConfig struct {
+	Endpoint  string   `mapstructure:"endpoint"`
 	Endpoints []string `mapstructure:"endpoints"`
 }
 
@@ -35,7 +36,7 @@ type config struct {
 	Name     string         `mapstructure:"name"`
 	Jwt      jwtConfig      `mapstructure:"jwt"`
 	Mysql    mysqlConfig    `mapstructure:"mysql"`
-	Rocketmq rocketmqConfig `mapstructure:"db"`
+	Rocketmq rocketmqConfig `mapstructure:"rocketmq"`
 	Oss      ossConfig      `mapstructure:"oss"`
 }
 
@@ -46,7 +47,6 @@ var (
 
 func InitConfig() (err error) {
 	viper.New()
-
 	var (
 		v *viper.Viper
 	)

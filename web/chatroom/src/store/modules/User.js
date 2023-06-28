@@ -1,7 +1,6 @@
 import {getUserInfo} from '../../utils/utils.js';
 
 const state = {
-    id:null,
     info:null,
     auth:false,
     token:null,

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"chatroom/app/models"
-	"chatroom/internal/global"
+	"chatroom/internal/db"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ func User(c *gin.Context) *models.User {
 	if exists {
 		authInfo := cc.(*Info)
 		if authInfo.User == nil {
-			global.DB.Limit(1).Find(&authInfo.User, authInfo.UserID)
+			db.G_DB.Limit(1).Find(&authInfo.User, authInfo.UserID)
 		}
 		return authInfo.User
 	}

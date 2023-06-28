@@ -8,6 +8,7 @@ const API_URL = ''
 // const OSS_BUCKET_FILE=''
 // const OSS_BUCKET_IMAGE=''
 
+
 export default{
     API_URL,
     // OSS_ACCESSKEY_ID,

@@ -1,5 +1,4 @@
 <template>
-
   <div class="login-form">
     <div class="form_title">ChatRoom</div>
     <a-form  :form="form" layout="vertical"  @submit="handleSubmit">

@@ -1,37 +1,59 @@
 <template>
   <div class="chats">
-    <div class="chat" v-for="(chat,name,index) in chats" :key="index">
-      <div class="avatar">
-        <img class="img" :src="chat.avatar" alt="">
-      </div>
-      <div class="info" :data-time="chat.lasttime">
-        <div class="top">
-          <div class="name">{{chat.name}}</div>
-          <div class="time">{{chat.lasttime}}</div>
+    <a-dropdown class="chat" v-for="(chat,name,index) in chats" :key="index" :trigger="['contextmenu']" >
+      <div @click="current(chat)" :class="{active:currentChat.id === chat.id}">
+        <div class="avatar">
+          <img class="img" :src="chat.avatar" alt="">
         </div>
-        <div class="bottom">{{chat.lastmag.context}}</div>
+        <div class="info" >
+          <div class="top">{{chat.name}}</div>
+          <!--          <div class="bottom">1000人</div>-->
+        </div>
       </div>
-    </div>
+      <a-menu slot="overlay">
+        <a-menu-item key="1" @click="toggleTop(chat)">置顶</a-menu-item>
+        <a-menu-item key="2" @click="toggleDisturb(chat)">消息免打扰</a-menu-item>
+        <a-menu-divider />
+<!--        <a-menu-item key="3" @click="">退出聊天室</a-menu-item>-->
+      </a-menu>
+    </a-dropdown>
   </div>
 </template>
 
 <script>
+import { Menu,Dropdown  } from 'ant-design-vue';
 
 export default {
   name: 'ChatsPanel',
   components:{
-
+    'a-menu':Menu,
+    'a-menu-item':Menu.Item,
+    'a-menu-divider':Menu.Divider,
+    'a-dropdown':Dropdown,
   },
   data(){
     return{
-      chats:[
-          {name:"aaa",avatar:"",lastmag:{type:"text",context:"haha11111111111hahahhaha11111111111hahahhaha11111111111hahahhaha11111111111hahah"},lasttime:"2023-01-01",unread:99},
-          {name:"aaa",avatar:"https://web.rentsoft.cn/static/media/login_bg.e42640a5.png",lastmag:{type:"text",context:"hhhhhhh"},lasttime:"2023-01-01",unread:88}
-      ]
+
     }
   },
+  computed: {
+    chats() {
+      return this.$store.state.chat.chats
+    },
+    currentChat() {
+      return this.$store.state.chat.currentChat
+    },
+  },
   methods:{
-
+    current(chat){
+      this.$store.dispatch('SET_CURRENT_CHAT',chat)
+    },
+    toggleTop(chat){
+      console.log(chat)
+    },
+    toggleDisturb(chat){
+      console.log(chat)
+    }
   }
 }
 </script>
@@ -40,6 +62,26 @@ export default {
 .chats{
   width:350px;
   padding: 10px;
+  height:100%;
+  max-height: 100%;
+  border-right: 1px solid #ccc;
+  overflow:auto;
+  overflow-x:hidden;
+  cursor: default;
+  &::-webkit-scrollbar {
+    width: 6px; /* 设置滚动条宽度 */
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2); /* 设置滚动条颜色 */
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4); /* 设置滚动条悬停时的颜色 */
+  }
+  .active{
+    background-color: #f3f8fe;
+  }
   .chat{
     display: flex;
     align-items: center;

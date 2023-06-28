@@ -14,11 +14,11 @@ func RespOk(c *gin.Context, data any) {
 	Resp(c, http.StatusOK, StatusOK, data, "success")
 }
 
-func RespFail(c *gin.Context, errcode ErrCode, msg any) {
+func RespFail(c *gin.Context, errcode errCode, msg any) {
 	Resp(c, http.StatusOK, errcode, nil, msg)
 }
 
-func RespAbort(c *gin.Context, errcode ErrCode, msg any) {
+func RespAbort(c *gin.Context, errcode errCode, msg any) {
 	c.Abort()
 	Resp(c, http.StatusOK, errcode, nil, msg)
 }
@@ -26,7 +26,7 @@ func RespAbort(c *gin.Context, errcode ErrCode, msg any) {
 //c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 //	"message": "Invalid token",
 //})
-func Resp(c *gin.Context, status int, errcode ErrCode, data any, msg any) {
+func Resp(c *gin.Context, status int, errcode errCode, data any, msg any) {
 	switch v := msg.(type) {
 	case error:
 		msg = v.Error()

@@ -4,6 +4,7 @@ import (
 	"chatroom/internal/auth"
 	"chatroom/internal/common"
 	"chatroom/internal/config"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"strings"
@@ -18,10 +19,14 @@ func AuthMiddleware() gin.HandlerFunc {
 			ok            bool
 		)
 		authorization = c.GetHeader("Authorization")
+		fmt.Println("authorization", authorization)
 		authorization = strings.TrimPrefix(authorization, "Bearer ")
 		if authorization == "" {
-			common.RespAbort(c, common.StatusUnauthorized, common.ERR_UNAUTHORIZED)
-			return
+			authorization = strings.TrimPrefix(c.Query("Authorization"), "Bearer ")
+			if authorization == "" {
+				common.RespAbort(c, common.StatusUnauthorized, common.ERR_UNAUTHORIZED)
+				return
+			}
 		}
 		// 解析 JWT
 		token, err := jwt.Parse(authorization, func(token *jwt.Token) (interface{}, error) {

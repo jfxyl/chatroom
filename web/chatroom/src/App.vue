@@ -18,11 +18,12 @@ export default {
       .then(function(data){
         if(data.data.errcode !== 0){
           message.error(data.data.msg);
-          if(that.$route.path !== '/login' || that.$route.path !== '/Login'){
+          if(that.$route.path !== '/login' && that.$route.path !== '/Login'){
             that.$router.push('/login');
           }
         }else{
           that.$store.dispatch('LOGIN',data.data.data)
+          that.$store.dispatch('GET_CHATS')
           that.$store.dispatch('GET_ROOMS')
           if(that.$route.path === '/login' || that.$route.path === '/Login'){
             that.$router.push('/');
@@ -37,10 +38,19 @@ export default {
 
   },
   computed:{
-
+    isLogin(){
+      return this.$store.state.user.auth
+    }
   },
   watch:{
-
+    isLogin(){
+      console.log(this.isLogin)
+      if(this.isLogin){
+        this.$store.dispatch('CONN_SOCKET')
+      }else{
+        this.$store.dispatch('CLOSE_SOCKET')
+      }
+    }
   }
 }
 </script>

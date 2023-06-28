@@ -23,7 +23,8 @@ type User struct {
 	Birthday *time.Time `gorm:"column:birthday;" json:"birthday"`
 	Password string     `gorm:"column:password;type:varchar(100);not null;" json:"-"`
 
-	Rooms []*Room `gorm:"many2many:user_rooms;"`
+	Rooms     []*Room     `gorm:"many2many:user_rooms;"`
+	UserRooms []*UserRoom `gorm:""`
 	base.BaseTimeModel
 }
 

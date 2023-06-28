@@ -5,10 +5,11 @@ import "chatroom/app/models/base"
 type MessageRead struct {
 	base.BaseIDModel
 
-	MessageID uint64 `gorm:"column:message_id;index;not null;"`
+	MessageID uint64 `gorm:"column:message_id;uniqueIndex:index_message_user;not null;"`
 	Message   Message
-	UserID    string `gorm:"column:user_id;type:varchar(20);index;not null;"`
+	UserID    uint64 `gorm:"column:user_id;uniqueIndex:index_message_user;not null;"`
 	User      User
+	Read      bool `gorm:"column:read;not null;default:false;"`
 
 	base.BaseCreatedAtModel
 }

@@ -17,6 +17,10 @@ type Room struct {
 	Notice   string `gorm:"column:notice;type:varchar(2048);not null;"`
 
 	Users []*User `gorm:"many2many:user_rooms;"`
+
+	UserRooms []UserRoom
+
+	Messages []*Message `gorm:"foreignKey:receiver_id"`
 	base.BaseTimeModel
 }
 

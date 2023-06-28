@@ -10,8 +10,8 @@ module.exports = defineConfig({
         pathRewrite:{
 
         },
-        // ws: true,//用于支持websocket 默认为真
-        // changeOrigin: true//用户控制请求头中的host值 默认为真
+        ws: true,//用于支持websocket 默认为真
+        changeOrigin: true//用户控制请求头中的host值 默认为真
       },
     }
 

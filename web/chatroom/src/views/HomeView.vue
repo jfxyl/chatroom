@@ -235,6 +235,7 @@ export default {
                     formErrorPrompt(that.createRoomform,form,data.data.msg)
                   }else{
                     that.$store.dispatch('GET_ROOMS')
+                    that.$store.dispatch('GET_CHATS')
                     message.success('创建成功');
                     that.createRoomModalIsShow = false
                   }
@@ -255,6 +256,7 @@ export default {
               message.error(data.data.msg);
             }else{
               that.$store.dispatch('GET_ROOMS')
+              that.$store.dispatch('GET_CHATS')
               message.success('操作成功');
               that.joinRoomModalIsShow = false
             }

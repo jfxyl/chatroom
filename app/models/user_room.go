@@ -13,5 +13,7 @@ type UserRoom struct {
 	RoomID uint64 `gorm:"column:room_id;uniqueIndex:index_user_room;not null;"`
 	Room   *Room
 
-	//base.BaseCreatedAtModel
+	Alias string `gorm:"column:alias;type:varchar(100);" json:"alias"`
+
+	base.BaseCreatedAtModel
 }
