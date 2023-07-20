@@ -6,8 +6,11 @@ import (
 	"chatroom/internal/auth"
 	"chatroom/internal/common"
 	"chatroom/internal/db"
+	"chatroom/internal/mgr"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func NewRoomService() *RoomService {
@@ -93,27 +96,61 @@ func (s *RoomService) Info(c *gin.Context, id uint64) (*models.Room, *common.Cod
 	return &room, nil
 }
 
-func (s *RoomService) Join(c *gin.Context, id uint64) *common.CodeErr {
+func (s *RoomService) Find(c *gin.Context, query map[string]any) (*models.Room, *common.CodeErr) {
 	var (
 		err  error
 		room models.Room
 	)
-	if err = db.G_DB.Limit(1).Find(&room, id).Error; err != nil {
+	if err = db.G_DB.Where(query).Limit(1).Find(&room).Error; err != nil {
+		return nil, common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	}
+	if room.ID == 0 {
+		return nil, common.NewCodeErr(common.StatusNotFound, common.ERR_NOT_FOUND)
+	}
+	return &room, nil
+}
+
+func (s *RoomService) Join(c *gin.Context, id uint64) *common.CodeErr {
+	var (
+		err     error
+		room    models.Room
+		message models.Message
+	)
+	if err = db.G_DB.Preload("UserRooms", func(db *gorm.DB) *gorm.DB {
+		return db.Where(map[string]any{"user_id": auth.User(c).ID}).Limit(1)
+	}).Limit(1).Find(&room, id).Error; err != nil {
 		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
 	}
 	if room.ID == 0 {
 		return common.NewCodeErr(common.StatusNotFound, common.ERR_NOT_FOUND)
 	}
+	if len(room.UserRooms) > 0 {
+		return common.NewCodeErr(common.StatusAlreadyExists, errors.New("已在该聊天室中"))
+	}
 	if err = s.Associate(auth.User(c), &room); err != nil {
 		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
 	}
+	message = models.Message{
+		ChatType:   models.ChatType(2),
+		MsgType:    models.MsgType(1),
+		SenderID:   auth.User(c).ID,
+		ReceiverID: room.ID,
+		Content:    fmt.Sprintf("【%s】加入了聊天室", auth.User(c).Name),
+		Operate:    models.OperateJoinRoom,
+	}
+	if db.G_DB.Create(&message).Error != nil {
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
+		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	}
+	mgr.G_MessageMgr.WriteMessage(&message)
 	return nil
 }
 
 func (s *RoomService) Quit(c *gin.Context, id uint64) *common.CodeErr {
 	var (
-		err  error
-		room models.Room
+		err     error
+		room    models.Room
+		message models.Message
 	)
 	if err = db.G_DB.Limit(1).Find(&room, id).Error; err != nil {
 		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
@@ -127,5 +164,18 @@ func (s *RoomService) Quit(c *gin.Context, id uint64) *common.CodeErr {
 	if db.G_DB.Model(auth.User(c)).Association("Rooms").Delete(room) != nil {
 		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
 	}
+	message = models.Message{
+		ChatType:   models.ChatType(2),
+		MsgType:    models.MsgType(1),
+		SenderID:   auth.User(c).ID,
+		ReceiverID: room.ID,
+		Content:    fmt.Sprintf("【%s】退出了聊天室", auth.User(c).Name),
+		Operate:    models.OperateQuitRoom,
+	}
+	if db.G_DB.Create(&message).Error != nil {
+		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
+		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	}
+	mgr.G_MessageMgr.WriteMessage(&message)
 	return nil
 }

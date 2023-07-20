@@ -2,14 +2,17 @@
   <div class="chats">
     <a-dropdown class="chat" v-for="(chat,name,index) in chats" :key="index" :trigger="['contextmenu']" >
       <div @click="current(chat)" :class="{active:currentChat.id === chat.id}">
+        <a-badge :dot="chat.unread_count > 0">
         <div class="avatar">
           <img class="img" :src="chat.avatar" alt="">
         </div>
+        </a-badge>
         <div class="info" >
           <div class="top">{{chat.name}}</div>
           <!--          <div class="bottom">1000人</div>-->
         </div>
       </div>
+
       <a-menu slot="overlay">
         <a-menu-item key="1" @click="toggleTop(chat)">置顶</a-menu-item>
         <a-menu-item key="2" @click="toggleDisturb(chat)">消息免打扰</a-menu-item>
@@ -17,11 +20,12 @@
 <!--        <a-menu-item key="3" @click="">退出聊天室</a-menu-item>-->
       </a-menu>
     </a-dropdown>
+
   </div>
 </template>
 
 <script>
-import { Menu,Dropdown  } from 'ant-design-vue';
+import { Menu,Dropdown,Badge  } from 'ant-design-vue';
 
 export default {
   name: 'ChatsPanel',
@@ -30,10 +34,11 @@ export default {
     'a-menu-item':Menu.Item,
     'a-menu-divider':Menu.Divider,
     'a-dropdown':Dropdown,
+    'a-badge':Badge,
   },
   data(){
     return{
-
+      count:6
     }
   },
   computed: {
@@ -53,12 +58,12 @@ export default {
     },
     toggleDisturb(chat){
       console.log(chat)
-    }
+    },
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chats{
   width:350px;
   padding: 10px;
@@ -134,9 +139,8 @@ export default {
     }
 
   }
-  .current{
+  .chat:hover{
     background-color: #f3f8fe;
-    border-radius: 8px;
   }
 }
 </style>

@@ -21,6 +21,10 @@ const TypeLocation MsgType = 7
 const TypeChatRecords MsgType = 8
 const TypeShare MsgType = 9
 
+const OperateCreateRoom = "create_room"
+const OperateJoinRoom = "join_room"
+const OperateQuitRoom = "quit_room"
+
 type Message struct {
 	base.BaseIDModel
 
@@ -32,6 +36,7 @@ type Message struct {
 	ReplyID      uint64   `gorm:"column:reply_id;index" json:"reply_id"`
 	ReplyMessage *Message `gorm:"-"`
 	Revoked      uint8    `gorm:"column:revoked;default:0;comment:是否撤回" json:"revoked"`
+	Operate      string   `gorm:"column:operate;type:varchar(30);" json:"operate"`
 
 	Sender     *User          `gorm:"foreignKey:sender_id"`
 	ReaderInfo []*MessageRead `gorm:"foreignKey:message_id"`
@@ -74,6 +79,7 @@ func (m *Message) Transform(userID uint64) map[string]any {
 		"content":     m.Content,
 		"reply_id":    m.ReplyID,
 		"revoked":     m.Revoked,
+		"operate":     m.Operate,
 		"created_at":  m.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 }

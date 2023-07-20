@@ -8,6 +8,10 @@ const TypeLocation  = 7
 const TypeChatRecords  = 8
 const TypeShare  = 9
 
+const OperateCreateRoom = "create_room"
+const OperateJoinRoom = "join_room"
+const OperateQuitRoom = "quit_room"
+
 export default{
     TypeNotice,
     TypeText,
@@ -18,4 +22,8 @@ export default{
     TypeLocation,
     TypeChatRecords,
     TypeShare,
+
+    OperateCreateRoom,
+    OperateJoinRoom,
+    OperateQuitRoom
 }

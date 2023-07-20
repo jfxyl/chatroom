@@ -28,7 +28,7 @@ type User struct {
 	base.BaseTimeModel
 }
 
-func (m *User) BeforeCreate(tx *gorm.DB) (err error) {
+func (m *User) BeforeSave(tx *gorm.DB) (err error) {
 	if len(m.Password) != 60 {
 		var pwd []byte
 		if pwd, err = bcrypt.GenerateFromPassword([]byte(m.Password), 14); err != nil {

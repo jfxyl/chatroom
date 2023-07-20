@@ -1,7 +1,7 @@
 import {getUserInfo} from '../../utils/utils.js';
 
 const state = {
-    info:null,
+    info:{},
     auth:false,
     token:null,
     expired_at:null,
@@ -11,6 +11,12 @@ const mutations = {
     LOGIN (state){
         state.auth = true
     },
+    LOGOUT (state){
+        state.auth = false
+        localStorage.removeItem('userInfo')
+        localStorage.removeItem('token')
+        localStorage.removeItem('expired_at')
+    },
     SET_USER_INFO (state,userInfo) {
         state.info = {
             id : userInfo.id,
@@ -19,6 +25,7 @@ const mutations = {
             avatar : userInfo.avatar,
             gender : userInfo.gender,
             birthday : userInfo.birthday,
+            created_at : userInfo.created_at,
         }
         localStorage.setItem('userInfo',JSON.stringify(userInfo))
     },
@@ -38,6 +45,9 @@ const actions = {
         context.commit('LOGIN')
         this.dispatch('SET_USER_INFO',userInfo)
     },
+    LOGOUT (context){
+        context.commit('LOGOUT')
+    },
     SET_USER_INFO (context,userInfo) {
         // do something async
         context.commit('SET_USER_INFO',userInfo)
@@ -47,7 +57,6 @@ const actions = {
     },
     GET_USER (){
         getUserInfo(this)
-
     }
 }
 

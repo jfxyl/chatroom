@@ -5,6 +5,7 @@ import (
 	"chatroom/app/http/services"
 	"chatroom/app/models"
 	"chatroom/internal/common"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -96,7 +97,39 @@ func (o *RoomController) Info(c *gin.Context) {
 		return
 	}
 	common.RespOk(c, room.Transform())
+}
 
+func (o *RoomController) Find(c *gin.Context) {
+	var (
+		err     error
+		codeErr *common.CodeErr
+		field   string
+		content string
+		id      uint64
+		room    *models.Room
+		query   = make(map[string]any)
+	)
+	field = c.Query("field")
+	content = c.Query("content")
+	fmt.Println(field, content)
+	if field == "id" {
+		if id, err = strconv.ParseUint(content, 10, 64); err != nil {
+			common.RespFail(c, common.StatusInvalidArgument, "参数错误")
+			return
+		}
+		query["id"] = id
+	} else if field == "name" {
+		query["name"] = content
+	} else {
+		common.RespFail(c, common.StatusInvalidArgument, "参数错误")
+		return
+	}
+	fmt.Println("query", query)
+	if room, codeErr = o.RoomService.Find(c, query); codeErr != nil {
+		common.RespFail(c, codeErr.Code, codeErr.Err)
+		return
+	}
+	common.RespOk(c, room.Transform())
 }
 
 func (o *RoomController) Join(c *gin.Context) {

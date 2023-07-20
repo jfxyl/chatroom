@@ -67,6 +67,9 @@ export default {
               that.$store.dispatch('REFRESH_TOKEN',data.data.data.jwt)
               message.success('登录成功');
               that.$router.push('/');
+              that.$store.dispatch('GET_USER')
+              that.$store.dispatch('GET_CHATS')
+              that.$store.dispatch('GET_ROOMS')
             }
           })
         }
@@ -77,7 +80,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .login-form{
   border-radius: 10px;
   box-shadow: 0 0 30px rgba(0,0,0,.1);

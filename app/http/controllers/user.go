@@ -96,47 +96,47 @@ func (o *UserController) Info(c *gin.Context) {
 }
 
 func (o *UserController) Update(c *gin.Context) {
-	//	var (
-	//		err   error
-	//		errs  map[string]string
-	//		idStr string
-	//		id    uint64
-	//		form  requests.RegisterForm
-	//		user  models.User
-	//	)
-	//	idStr = c.Param("id")
-	//	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
-	//		common.RespFail(c, common.StatusInvalidArgument, err.Error())
-	//		return
-	//	}
-	//	if err = db.G_DB.Limit(1).Find(&user, id).Error; err != nil {
-	//		common.RespFail(c, common.StatusInternal, err.Error())
-	//		return
-	//	}
-	//	if user.ID == 0 {
-	//		common.RespFail(c, common.StatusNotFound, common.ERR_NOT_FOUND)
-	//		return
-	//	}
-	//	if err = c.ShouldBindJSON(&form); err != nil {
-	//		common.RespFail(c, common.StatusInvalidArgument, err)
-	//		return
-	//	}
-	//	if errs = common.SimplifyError(requests.ValidateUserForm(form)); errs != nil && len(errs) > 0 {
-	//		common.RespFail(c, common.StatusInvalidArgument, errs)
-	//		return
-	//	}
-	//	birthday, _ := time.Parse("2006-01-02", form.Birthday)
-	//	user = models.User{
-	//		Name:     form.Name,
-	//		Nickname: form.Nickname,
-	//		Gender:   form.Gender,
-	//		Avatar:   form.Avatar,
-	//		Birthday: &birthday,
-	//		Password: form.Password,
-	//	}
-	//	if db.G_DB.Save(&user).Error != nil {
-	//		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)
-	//		return
-	//	}
-	//	common.RespOk(c, user.Transform())
+	var (
+		err     error
+		errs    map[string]string
+		form    requests.UpdateForm
+		user    *models.User
+		codeErr *common.CodeErr
+	)
+	if err = c.ShouldBindJSON(&form); err != nil {
+		common.RespFail(c, common.StatusInvalidArgument, err)
+		return
+	}
+	if errs = common.SimplifyError(requests.ValidateUserForm(form, c)); errs != nil && len(errs) > 0 {
+		common.RespFail(c, common.StatusInvalidArgument, errs)
+		return
+	}
+	if user, codeErr = o.UserService.Update(c, form); codeErr != nil {
+		common.RespFail(c, codeErr.Code, codeErr.Err)
+		return
+	}
+	common.RespOk(c, user.Transform())
+}
+
+func (o *UserController) UpdatePassword(c *gin.Context) {
+	var (
+		err     error
+		errs    map[string]string
+		form    requests.UpdatePasswordForm
+		user    *models.User
+		codeErr *common.CodeErr
+	)
+	if err = c.ShouldBindJSON(&form); err != nil {
+		common.RespFail(c, common.StatusInvalidArgument, err)
+		return
+	}
+	if errs = common.SimplifyError(requests.ValidateUpdatePasswordForm(form)); errs != nil && len(errs) > 0 {
+		common.RespFail(c, common.StatusInvalidArgument, errs)
+		return
+	}
+	if user, codeErr = o.UserService.UpdatePassword(c, form); codeErr != nil {
+		common.RespFail(c, codeErr.Code, codeErr.Err)
+		return
+	}
+	common.RespOk(c, user.Transform())
 }

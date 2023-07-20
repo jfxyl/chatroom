@@ -35,11 +35,20 @@ func init() {
 
 		tableName := rng[0]
 		dbFiled := rng[1]
+		without := ""
+		if len(rng) >= 3 {
+			without = rng[2]
+		}
 		val := value.(string)
 
-		var count int64
-		db.G_DB.Table(tableName).Where(dbFiled+" = ?", val).Where("deleted_at IS NULL").Count(&count)
+		fmt.Println("without", without)
 
+		var count int64
+		var query = db.G_DB.Table(tableName).Where(dbFiled+" = ?", val).Where("deleted_at IS NULL")
+		if without != "" {
+			query = query.Where("id != ?", without)
+		}
+		query.Count(&count)
 		if count != 0 {
 			if message != "" {
 				return errors.New(message)

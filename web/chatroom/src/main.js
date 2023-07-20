@@ -17,6 +17,12 @@ Vue.prototype._const = _const
 import utils from './utils/utils.js'
 Vue.prototype.utils = utils
 
+Vue.prototype._genderMap = {
+  0: '未知',
+  1: '男',
+  2: '女'
+}
+
 Vue.config.productionTip = false
 
 Vue.prototype.globalClick = function (callback) { //页面全局点击

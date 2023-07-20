@@ -12,7 +12,7 @@
       </div>
       <a-menu slot="overlay">
         <a-menu-item key="1" @click="toChat(room)">发消息</a-menu-item>
-        <a-menu-item key="2" @click="setAlias(room)">备注设置</a-menu-item>
+<!--        <a-menu-item key="2" @click="setAlias(room)">备注设置</a-menu-item>-->
         <a-menu-divider />
         <a-menu-item key="3" @click="quitRoom(room)">退出聊天室</a-menu-item>
       </a-menu>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { Menu,Dropdown  } from 'ant-design-vue';
+import {Menu, Dropdown, Modal, message} from 'ant-design-vue';
 export default {
   name: 'RoomsPanel',
   components:{
@@ -42,25 +42,58 @@ export default {
     currentRoom() {
       return this.$store.state.room.currentRoom
     },
+    chats() {
+      return this.$store.state.chat.chats
+    },
   },
   methods:{
     current(room){
       this.$store.dispatch('SET_CURRENT_ROOM',room)
     },
     toChat(room){
-      console.log(room)
+      //循环chats,找到currentRoom.id==chat.roomId的chat,将其赋值给currentChat
+      for(let i=0;i<this.chats.length;i++){
+        if(this.chats[i].id==room.id){
+          this.$store.dispatch('SET_CURRENT_CHAT',this.chats[i])
+          break
+        }
+      }
+      this.$router.push({path:'/chat'})
     },
     setAlias(room){
       console.log(room)
     },
-    quitRoom(room){
-      console.log(room)
-    }
+    quitRoom(room) {
+      let that = this
+      Modal.confirm({
+        title: '确定退出聊天室么?',
+        okText: '确定',
+        cancelText: '取消',
+        onOk() {
+          that.$http.post(`/v1/rooms/${room.id}/quit`)
+              .then(function(data){
+                if(data.data.errcode !== 0){
+                  message.error(data.data.msg);
+                }else{
+                  that.settingVisible = false
+                  that.$store.dispatch('SET_CURRENT_CHAT', {})
+                  that.$store.dispatch('GET_ROOMS')
+                  that.$store.dispatch('GET_CHATS')
+                  message.success('操作成功');
+                }
+              })
+              .catch(function (err){
+                console.log(err)
+              })
+        },
+        onCancel() {},
+      });
+    },
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .rooms{
   width:350px;
   padding: 10px;
@@ -129,6 +162,9 @@ export default {
 
     }
 
+  }
+  .room:hover{
+    background-color: #f3f8fe;
   }
   .current{
     background-color: #f3f8fe;

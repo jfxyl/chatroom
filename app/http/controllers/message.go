@@ -46,21 +46,28 @@ func (o *MessageController) Send(c *gin.Context) {
 
 func (o *MessageController) List(c *gin.Context) {
 	var (
-		err      error
-		idStr    string
-		id       uint64
-		codeErr  *common.CodeErr
-		message  *models.Message
-		messages []*models.Message
+		err         error
+		idStr       string
+		id          uint64
+		minMsgIDStr string
+		minMsgID    uint64
+		codeErr     *common.CodeErr
+		message     *models.Message
+		messages    []*models.Message
 
-		transformMessages []map[string]any
+		transformMessages = make([]map[string]any, 0)
 	)
 	idStr = c.Param("id")
+
 	if id, err = strconv.ParseUint(idStr, 10, 64); err != nil {
 		common.RespFail(c, common.StatusInvalidArgument, err.Error())
 		return
 	}
-	if messages, codeErr = o.MessageService.List(c, id); codeErr != nil {
+	minMsgIDStr = c.Query("min_msg_id")
+	if minMsgID, err = strconv.ParseUint(minMsgIDStr, 10, 64); err != nil {
+		minMsgID = 0
+	}
+	if messages, codeErr = o.MessageService.List(c, id, minMsgID); codeErr != nil {
 		common.RespFail(c, codeErr.Code, codeErr.Err)
 		return
 	}

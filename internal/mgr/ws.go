@@ -23,12 +23,9 @@ type WsMgr struct {
 }
 
 func (m *WsMgr) Set(userID uint64, wsConn *websocket.Conn) {
-	fmt.Println("set ws conn")
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 	if oldConn, ok := m.get(userID); ok {
-		fmt.Println("oldConn", oldConn)
-		fmt.Println("wsConn", wsConn)
 		if oldConn != wsConn {
 			err := oldConn.Close()
 			fmt.Println("Close err", err)
@@ -44,7 +41,6 @@ func (m *WsMgr) Get(userID uint64) (conn *websocket.Conn, ok bool) {
 }
 
 func (m *WsMgr) Del(userID uint64, oldConn *websocket.Conn) {
-	fmt.Println("del ws conn")
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 	if conn, ok := m.get(userID); ok {

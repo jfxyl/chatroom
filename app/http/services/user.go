@@ -3,12 +3,29 @@ package services
 import (
 	"chatroom/app/http/requests"
 	"chatroom/app/models"
+	"chatroom/internal/auth"
 	"chatroom/internal/common"
 	"chatroom/internal/db"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"time"
 )
+
+var defaultAvatars = [12]string{
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/mouse.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/cattle.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/tiger.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/rabbit.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/dragon.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/snake.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/horse.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/sheep.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/monkey.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/kun.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/dog.jpg",
+	"https://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/user/pig.jpg",
+}
 
 func NewUserService() *UserService {
 	return &UserService{}
@@ -26,8 +43,8 @@ func (s *UserService) Create(c *gin.Context, form requests.RegisterForm) (*model
 	user = &models.User{
 		Name:     form.Name,
 		Nickname: fmt.Sprintf("用户%s", common.RandString(6)),
+		Avatar:   defaultAvatars[common.RandInt(len(defaultAvatars))],
 		//Gender:   form.Gender,
-		//Avatar:   form.Avatar,
 		//Birthday: nil,
 		Password: form.Password,
 	}
@@ -70,4 +87,33 @@ func (s *UserService) Info(c *gin.Context, id uint64) (*models.User, *common.Cod
 		return nil, common.NewCodeErr(common.StatusNotFound, common.ERR_NOT_FOUND)
 	}
 	return &user, nil
+}
+
+func (s *UserService) Update(c *gin.Context, form requests.UpdateForm) (*models.User, *common.CodeErr) {
+	var (
+		user *models.User
+	)
+	user = auth.User(c)
+	birthday, _ := time.Parse("2006-01-02", form.Birthday)
+	user.Name = form.Name
+	user.Nickname = form.Nickname
+	user.Gender = form.Gender
+	user.Avatar = form.Avatar
+	user.Birthday = &birthday
+	if db.G_DB.Save(&user).Error != nil {
+		return nil, common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	}
+	return user, nil
+}
+
+func (s *UserService) UpdatePassword(c *gin.Context, form requests.UpdatePasswordForm) (*models.User, *common.CodeErr) {
+	var (
+		user *models.User
+	)
+	user = auth.User(c)
+	user.Password = form.Password
+	if db.G_DB.Save(&user).Error != nil {
+		return nil, common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+	}
+	return user, nil
 }

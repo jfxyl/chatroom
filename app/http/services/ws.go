@@ -45,9 +45,16 @@ func (o *WsService) Read(userId uint64, conn *websocket.Conn) {
 	var (
 		err         error
 		messageByte []byte
+		unix        = time.Now().Unix()
 	)
+	fmt.Println("-----------------------------")
+	fmt.Println("unix", unix)
+	fmt.Println("userId", userId)
+	fmt.Printf("conn = %p\n", conn)
 	defer func() {
-		mgr.G_WsMgr.Del(userId, conn)
+		fmt.Println("unix", unix)
+		fmt.Println("userId", userId)
+		fmt.Printf("conn = %p\n", conn)
 	}()
 	for {
 		var (
@@ -59,10 +66,9 @@ func (o *WsService) Read(userId uint64, conn *websocket.Conn) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Println(err)
 			}
-			fmt.Println("Push err", err)
+			fmt.Println("Push err1", err)
 			break
 		}
-		fmt.Println(string(messageByte))
 		messageByte = bytes.TrimSpace(bytes.Replace(messageByte, newline, space, -1))
 
 		if err = json.Unmarshal(messageByte, &wsRequest); err == nil {
@@ -71,15 +77,17 @@ func (o *WsService) Read(userId uint64, conn *websocket.Conn) {
 			case "read":
 				bodyByte, _ = json.Marshal(wsRequest.Body)
 				if err = json.Unmarshal(bodyByte, &readBody); err == nil {
-					o.MessageService.Read(readBody, userId)
-					fmt.Println("readBody", readBody)
-
+					readBody.UserId = userId
+					o.MessageService.PushRead(&readBody)
+					//o.MessageService.Read(readBody, userId)
+					//fmt.Println("readBody", readBody)
 				}
 				fmt.Println("err", err)
 			}
 		}
-		fmt.Println("Push err", err)
+		fmt.Println("Push err2", err)
 	}
+	fmt.Println("READ 协程结束")
 }
 
 func (o *WsService) Write(userId uint64, conn *websocket.Conn) {
@@ -113,4 +121,5 @@ func (o *WsService) Write(userId uint64, conn *websocket.Conn) {
 			}
 		}
 	}
+	fmt.Println("WRITE 协程结束")
 }

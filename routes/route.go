@@ -40,12 +40,13 @@ func InitRouter(router *gin.Engine) {
 
 	userController = controllers.NewUserController()
 	{
-		userGroup.POST("/register", userController.Create)                      //用户注册
-		userGroup.POST("/login", userController.Login)                          //用户登录
-		userGroup.POST("/logout", userController.Logout)                        //用户登出
-		userGroup.GET("", middleware.AuthMiddleware(), userController.Info)     //用户信息
-		userGroup.GET("/:id", middleware.AuthMiddleware(), userController.Info) //用户信息
-		userGroup.PUT("", middleware.AuthMiddleware(), userController.Update)   //用户信息修改
+		userGroup.POST("/register", userController.Create)                                     //用户注册
+		userGroup.POST("/login", userController.Login)                                         //用户登录
+		userGroup.POST("/logout", userController.Logout)                                       //用户登出
+		userGroup.GET("", middleware.AuthMiddleware(), userController.Info)                    //用户信息
+		userGroup.GET("/:id", middleware.AuthMiddleware(), userController.Info)                //用户信息
+		userGroup.PUT("", middleware.AuthMiddleware(), userController.Update)                  //用户信息修改
+		userGroup.PUT("/password", middleware.AuthMiddleware(), userController.UpdatePassword) //用户信息修改
 	}
 
 	messageController = controllers.NewMessageController()
@@ -59,12 +60,14 @@ func InitRouter(router *gin.Engine) {
 	{
 		roomGroup.GET("", roomController.List)                 //用户拥有的聊天室
 		roomGroup.POST("", roomController.Create)              //创建聊天室
+		roomGroup.GET("/find", roomController.Find)            //查找聊天室
 		roomGroup.PUT("/:id", nil)                             //修改聊天室
 		roomGroup.GET("/:id", roomController.Info)             //聊天室信息
 		roomGroup.GET("/:id/messages", messageController.List) //聊天室聊天记录
-		roomGroup.POST("/:id/quit", roomController.Quit)       //退出聊天室
-		roomGroup.DELETE("/:id", roomController.Delete)        //删除聊天室
-		roomGroup.POST("/:id/join", roomController.Join)       //加入聊天室
+
+		roomGroup.POST("/:id/quit", roomController.Quit) //退出聊天室
+		roomGroup.DELETE("/:id", roomController.Delete)  //删除聊天室
+		roomGroup.POST("/:id/join", roomController.Join) //加入聊天室
 	}
 
 	chatController = controllers.NewChatController()

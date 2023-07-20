@@ -1,7 +1,6 @@
 package common
 
 import (
-	"chatroom/app/http/requests"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"math/rand"
@@ -74,24 +73,14 @@ func RandString(l int) string {
 	return string(result)
 }
 
+func RandInt(l int) int {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(12)
+}
+
 //func RandString(){
 //
 //}
-
-func JsonReqValidate(c *gin.Context, form requests.RegisterForm) any {
-	var (
-		err  error
-		errs map[string]string
-	)
-	if err = c.ShouldBindJSON(&form); err != nil {
-		return err
-	}
-	fmt.Println("form", form)
-	if errs = SimplifyError(requests.ValidateUserForm(form)); errs != nil && len(errs) > 0 {
-		return errs
-	}
-	return nil
-}
 
 func GenerateRandomFilename() string {
 	rand.Seed(time.Now().UnixNano())

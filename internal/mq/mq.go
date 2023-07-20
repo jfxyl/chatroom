@@ -39,6 +39,7 @@ func InitMQ() (err error) {
 	if err != nil {
 		return err
 	}
+
 	//G_PushConsumer.Subscribe("message", consumer.MessageSelector{})
 	//G_PushConsumer.Start()
 	//if err != nil {

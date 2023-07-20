@@ -22,16 +22,26 @@ export default {
     currentRoom() {
       return this.$store.state.room.currentRoom
     },
+    chats() {
+      return this.$store.state.chat.chats
+    },
   },
   methods:{
     toChat(){
-      console.log(this.currentRoom)
+      //循环chats,找到currentRoom.id==chat.roomId的chat,将其赋值给currentChat
+      for(let i=0;i<this.chats.length;i++){
+        if(this.chats[i].id==this.currentRoom.id){
+          this.$store.dispatch('SET_CURRENT_CHAT',this.chats[i])
+          break
+        }
+      }
+      this.$router.push({path:'/chat'})
     },
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   display: flex;
   flex-direction: column;

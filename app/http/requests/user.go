@@ -1,6 +1,9 @@
 package requests
 
 import (
+	"chatroom/internal/auth"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/thedevsaddam/govalidator"
 )
 
@@ -23,6 +26,11 @@ type UpdateForm struct {
 	Gender          int8   `form:"gender" json:"gender" valid:"gender"`
 	Birthday        string `form:"birthday" json:"birthday" valid:"birthday"`
 	Avatar          string `form:"avatar" json:"avatar" valid:"avatar"`
+}
+
+type UpdatePasswordForm struct {
+	Password        string `form:"password" json:"password" valid:"password"`
+	ConfirmPassword string `form:"confirm_password" json:"confirm_password" valid:"confirm_password"`
 }
 
 func ValidateRegisterForm(data RegisterForm) map[string][]string {
@@ -66,16 +74,14 @@ func ValidateRegisterForm(data RegisterForm) map[string][]string {
 	return errs
 }
 
-func ValidateUserForm(data RegisterForm) map[string][]string {
+func ValidateUserForm(data UpdateForm, c *gin.Context) map[string][]string {
 	// 1. 定制认证规则
 	rules := govalidator.MapData{
-		"name":             []string{"required", "min_cn:3", "max_cn:10", "alpha_num", "softdel_not_exists:users,name"},
-		"nickname":         []string{"required", "min_cn:3", "max_cn:10"},
-		"password":         []string{"required", "min_cn:6", "max_cn:10", "alpha_num"},
-		"confirm_password": []string{"required"},
-		"gender":           []string{"in:1,2"},
-		"birthday":         []string{"required", "date:yyyy-mm-dd"},
-		"avatar":           []string{"required"},
+		"name":     []string{"required", "min_cn:3", "max_cn:10", "alpha_num", fmt.Sprintf("softdel_not_exists:users,name,%d", auth.User(c).ID)},
+		"nickname": []string{"required", "min_cn:3", "max_cn:10"},
+		"gender":   []string{"in:1,2"},
+		"birthday": []string{"required", "date:yyyy-mm-dd"},
+		"avatar":   []string{"required"},
 	}
 
 	// 2. 定制错误消息
@@ -107,6 +113,35 @@ func ValidateUserForm(data RegisterForm) map[string][]string {
 		},
 		"avatar": []string{
 			"required:用户头像为必填项",
+		},
+	}
+
+	// 3. 配置初始化
+	opts := govalidator.Options{
+		Data:          &data,
+		Rules:         rules,
+		TagIdentifier: "valid", // 模型中的 Struct 标签标识符
+		Messages:      messages,
+	}
+	// 4. 开始验证
+	errs := govalidator.New(opts).ValidateStruct()
+	return errs
+}
+
+func ValidateUpdatePasswordForm(data UpdatePasswordForm) map[string][]string {
+	// 1. 定制认证规则
+	rules := govalidator.MapData{
+		"password":         []string{"required", "min_cn:6", "max_cn:10", "alpha_num"},
+		"confirm_password": []string{"required"},
+	}
+
+	// 2. 定制错误消息
+	messages := govalidator.MapData{
+		"password": []string{
+			"required:密码为必填项",
+			"min_cn:密码为字母、数字组成的6-10位字符",
+			"max_cn:密码为字母、数字组成的6-10位字符",
+			"alpha_num:密码为字母、数字组成的6-10位字符",
 		},
 	}
 
