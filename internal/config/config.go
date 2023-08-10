@@ -20,7 +20,6 @@ type mysqlConfig struct {
 }
 
 type rocketmqConfig struct {
-	Endpoint  string   `mapstructure:"endpoint"`
 	Endpoints []string `mapstructure:"endpoints"`
 }
 
@@ -34,6 +33,7 @@ type ossConfig struct {
 
 type config struct {
 	Name     string         `mapstructure:"name"`
+	Port     int            `mapstructure:"port"`
 	Jwt      jwtConfig      `mapstructure:"jwt"`
 	Mysql    mysqlConfig    `mapstructure:"mysql"`
 	Rocketmq rocketmqConfig `mapstructure:"rocketmq"`
@@ -86,5 +86,6 @@ func readConfig(v *viper.Viper) (err error) {
 		return
 	}
 	G_Config = &config
+	fmt.Printf("G_Config:%+v", *G_Config)
 	return
 }

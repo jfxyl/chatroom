@@ -18,7 +18,7 @@ const mutations = {
 const actions = {
     CONN_SOCKET(context,that){
         that = that || this
-        const socket = new WebSocket('ws://127.0.0.1:8081/v1/ws?Authorization=' + localStorage.getItem('token'));
+        const socket = new WebSocket(`ws://${window.location.host}/v1/ws?Authorization=${localStorage.getItem('token')}`);
         // WebSocket 连接建立成功的回调函数
         socket.onopen = function() {
             console.log('WebSocket 连接已建立');
@@ -46,7 +46,7 @@ const actions = {
                     console.log('message.operate == that._vm._const.OperateJoinRoom',message.operate, that._vm._const.OperateJoinRoom)
                     if(message.msg_type == that._vm._const.TypeNotice){
                         if(message.operate == that._vm._const.OperateJoinRoom){
-                            var exists = that.state.chat.currentChat.users.some(obj => obj.id == message.sender_id);
+                            let exists = that.state.chat.currentChat.users.some(obj => obj.id == message.sender_id);
                             if(!exists){
                                 that.state.chat.currentChat.users.push(message.sender)
                             }
@@ -55,19 +55,26 @@ const actions = {
                         }
                     }
                 }else{
+                    let exists = false
                     for(let i=0;i<that.state.chat.currentMsgs.length;i++){
                         if(that.state.chat.currentMsgs[i].id == message.id){
                             that.state.chat.currentMsgs[i].readers = message.readers
                             that.state.chat.currentMsgs[i].unreaders = message.unreaders
+                            exists = true
                             break
                         }
+                    }
+                    if(!exists){
+                        that.state.chat.currentMsgs.push(message)
                     }
                 }
             }
         };
         // WebSocket 连接关闭的回调函数
-        socket.onclose = function() {
+        socket.onclose = function(event) {
             console.log('WebSocket 连接已关闭');
+            console.log(new Date());
+            console.log('event',event);
             actions.RECONNECT_SOCKET(context,that);
         };
         // WebSocket 连接出错的回调函数
@@ -86,10 +93,12 @@ const actions = {
     },
     RECONNECT_SOCKET(context,that) {
         console.log('RECONNECT_SOCKET')
+        console.log(new Date());
         const timer = setTimeout(function() {
             console.log("Reconnecting WebSocket...");
+            console.log(new Date());
             actions.CONN_SOCKET(context,that);
-        }, 2000);
+        }, 10000);
         context.commit("SET_TIMER", timer);
     },
 }

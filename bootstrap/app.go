@@ -13,7 +13,9 @@ func BootStrap() (err error) {
 	//初始化命令行参数
 	InitArgs()
 	//初始化配置
-	config.InitConfig()
+	if err = config.InitConfig(); err != nil {
+		return
+	}
 	fmt.Println("初始化config成功")
 	//初始化数据库
 	if err = db.InitDatabase(); err != nil {

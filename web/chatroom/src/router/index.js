@@ -60,6 +60,10 @@ const routes = [
         component:  RoomView,
       }
     ]
+  },
+  {
+    path: '/:catchAll(.*)',
+    redirect: '/'
   }
 ]
 

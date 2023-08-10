@@ -24,6 +24,7 @@ func InitDatabase() (err error) {
 		config.G_Config.Mysql.Port,
 		config.G_Config.Mysql.Database,
 	)
+	fmt.Printf("dsn:%s", dsn)
 	G_DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 		Logger:                                   logger.Default.LogMode(logger.Info), //配置日志级别，打印出所有的sql

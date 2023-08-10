@@ -4,10 +4,14 @@ import (
 	"chatroom/app/http/controllers"
 	"chatroom/app/http/middleware"
 	"chatroom/internal/common"
+	"embed"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"io/fs"
+	"net/http"
 )
 
-func InitRouter(router *gin.Engine) {
+func InitRouter(router *gin.Engine, publicFS embed.FS) {
 	var (
 		v1Group   *gin.RouterGroup
 		wsGroup   *gin.RouterGroup
@@ -79,12 +83,27 @@ func InitRouter(router *gin.Engine) {
 	{
 		ossGroup.GET("/signature", ossController.Signature) //oss签名
 	}
+
+	//处理前端路由
+	staticFS, _ := fs.Sub(publicFS, "public")
+	router.StaticFS("/static", http.FS(staticFS))
 	router.NoRoute(func(c *gin.Context) {
 		acceptHeader := c.GetHeader("Accept")
 		if acceptHeader == "application/json" {
 			common.RespAbort(c, common.StatusNotFound, common.ERR_NOT_FOUND)
 		} else {
-			c.String(404, "404!!!")
+			file, err := staticFS.Open("index.html")
+			if err != nil {
+				fmt.Println("err", err)
+			}
+			defer file.Close()
+			content, err := fs.ReadFile(staticFS, "index.html")
+			if err != nil {
+				http.Error(c.Writer, "File not found", http.StatusNotFound)
+				return
+			}
+			c.Data(200, "text/html", content)
+			//c.Redirect(http.StatusMovedPermanently, "/static/index.html")
 		}
 		return
 	})

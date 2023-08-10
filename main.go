@@ -2,10 +2,16 @@ package main
 
 import (
 	"chatroom/bootstrap"
+	"chatroom/internal/config"
 	"chatroom/routes"
+	"embed"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 )
+
+//go:embed public/*
+var publicFS embed.FS
 
 func main() {
 	var (
@@ -18,6 +24,6 @@ func main() {
 	}
 	//初始化路由、http服务
 	r = gin.Default()
-	routes.InitRouter(r)
-	r.Run()
+	routes.InitRouter(r, publicFS)
+	r.Run(fmt.Sprintf(":%d", config.G_Config.Port))
 }

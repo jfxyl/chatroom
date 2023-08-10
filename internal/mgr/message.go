@@ -89,6 +89,7 @@ func (m *MessageMgr) Pull() {
 func (m *MessageMgr) SendReadInfo(msg models.Message) (err error) {
 	var (
 		ok      bool
+		conns   []*websocket.Conn
 		conn    *websocket.Conn
 		user    *models.UserRoom
 		users   []*models.UserRoom
@@ -104,13 +105,10 @@ func (m *MessageMgr) SendReadInfo(msg models.Message) (err error) {
 		}
 		fmt.Println("users", users)
 		for _, user = range users {
-			if conn, ok = G_WsMgr.get(user.UserID); ok {
-				//conn.SetWriteDeadline(time.Now().Add(writeWait))
-				//if !ok {
-				//	conn.WriteMessage(websocket.CloseMessage, []byte{})
-				//	return
-				//}
-				conn.WriteMessage(websocket.TextMessage, message)
+			if conns, ok = G_WsMgr.Get(user.UserID); ok {
+				for _, conn = range conns {
+					conn.WriteMessage(websocket.TextMessage, message)
+				}
 			}
 		}
 	}
@@ -161,6 +159,7 @@ func (m *MessageMgr) HandleRead(readBodyBatch *common.ReadBodyBatch) {
 	var (
 		err         error
 		msgUsersMap = make(map[uint64][]uint64)
+		conns       []*websocket.Conn
 		conn        *websocket.Conn
 		ok          bool
 		msgByte     []byte
@@ -178,12 +177,14 @@ func (m *MessageMgr) HandleRead(readBodyBatch *common.ReadBodyBatch) {
 		fmt.Println("messageID", messageID)
 		if err = db.G_DB.Where("id = ?", messageID).Limit(1).Find(&message).Error; err == nil && message.ID != 0 {
 			if err = db.G_DB.Model(&models.MessageRead{}).Where("message_id = ?", messageID).Where("user_id in ?", userIDs).Update("Read", true).Error; err == nil {
-				if conn, ok = G_WsMgr.Get(message.SenderID); ok {
+				if conns, ok = G_WsMgr.Get(message.SenderID); ok {
 					if err = db.G_DB.Model(&message).Association("ReaderInfo").Find(&message.ReaderInfo); err == nil {
 						fmt.Println("message_id", message.ID)
 						msgByte, _ = json.Marshal(message.Transform(0))
 						fmt.Println("msgByte", string(msgByte))
-						conn.WriteMessage(websocket.TextMessage, msgByte)
+						for _, conn = range conns {
+							conn.WriteMessage(websocket.TextMessage, msgByte)
+						}
 					}
 				}
 			}
@@ -195,6 +196,7 @@ func (m *MessageMgr) HandleRead(readBodyBatch *common.ReadBodyBatch) {
 func (m *MessageMgr) WriteMessage(message *models.Message) (err error) {
 	var (
 		ok          bool
+		conns       []*websocket.Conn
 		conn        *websocket.Conn
 		user        *models.UserRoom
 		users       []*models.UserRoom
@@ -213,13 +215,16 @@ func (m *MessageMgr) WriteMessage(message *models.Message) (err error) {
 		}
 		fmt.Println("users", users)
 		for _, user = range users {
-			if conn, ok = G_WsMgr.Get(user.UserID); ok {
+			if conns, ok = G_WsMgr.Get(user.UserID); ok {
 				//conn.SetWriteDeadline(time.Now().Add(writeWait))
 				//if !ok {
 				//	conn.WriteMessage(websocket.CloseMessage, []byte{})
 				//	return
 				//}
-				conn.WriteMessage(websocket.TextMessage, messageByte)
+				fmt.Println("conns", conns)
+				for _, conn = range conns {
+					conn.WriteMessage(websocket.TextMessage, messageByte)
+				}
 			}
 		}
 	}

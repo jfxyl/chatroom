@@ -23,7 +23,7 @@
           </div>
         </div>
       </div>
-      <div id="chat-box" class="content"  @scroll="handleChatBoxScroll" ref="chatmsgs">
+      <div id="chat-box" class="content"  @scroll="handleChatBoxRead" ref="chatmsgs">
         <ul v-infinite-scroll="loadMore">
           <li v-for="(msg,index) in currentMsgs" :id="'message-'+msg.id" :key="index" ref="msg">
             <div v-if="msg.msg_type === _const.TypeNotice" class="notice">{{msg.content}}</div>
@@ -392,7 +392,7 @@ export default {
       return moment(datetime).format('YYYY年M月D日 HH:mm');
     },
     // 监听消息框的滚动事件
-    handleChatBoxScroll:function() {
+    handleChatBoxRead:function() {
       const chatBox = document.getElementById('chat-box');
       const visibleMessages = this.getVisibleMessages(chatBox);
       console.log('visibleMessages',visibleMessages)
@@ -407,10 +407,13 @@ export default {
     getVisibleMessages:function(chatBox) {
       const scrollTop = chatBox.scrollTop + 102;
       const visibleMessages = [];
+      console.log('this.currentMsgs',this.currentMsgs)
       for (var message of this.currentMsgs) {
         var messageElement = document.getElementById(`message-${message.id}`);
         if(!messageElement) continue
         var middleOffsetTop = messageElement.offsetTop + messageElement.clientHeight / 2;
+        console.log('messageElement',messageElement)
+        console.log('middleOffsetTop',middleOffsetTop)
         if (middleOffsetTop >= scrollTop && middleOffsetTop <= scrollTop + chatBox.clientHeight) {
           visibleMessages.push(message);
         }
@@ -545,22 +548,37 @@ export default {
   },
   watch:{
     currentChat(){
-      console.log('scrollToBottom')
-      this.scrollToBottom()
-    },
-    currentMsgs(msgs){
-      if(msgs.length === 0) return
-      const chatBox = document.getElementById('chat-box');
-      const scrollTop = chatBox.scrollTop + 102;
-      //获取倒数第二条消息
-      const index = msgs.length >= 2 ? msgs.length - 2 : 0;
-      const messageElement = document.getElementById(`message-${msgs[index].id}`);
-      if(messageElement){
-        const middleOffsetTop = messageElement.offsetTop + messageElement.clientHeight / 2;
-        if (middleOffsetTop >= scrollTop && middleOffsetTop <= scrollTop + chatBox.clientHeight) {
+      this.$nextTick(() => {
+        console.log('scrollToBottom')
+        const chatBox = document.getElementById('chat-box');
+        if(chatBox.scrollHeight <= chatBox.clientHeight){
+          this.handleChatBoxRead()
+        }else{
           this.scrollToBottom()
         }
-      }
+      })
+    },
+    currentMsgs(msgs){
+      this.$nextTick(() => {
+        if (msgs.length === 0) return
+        const chatBox = document.getElementById('chat-box');
+        if (chatBox.scrollHeight <= chatBox.clientHeight) {
+          this.handleChatBoxRead()
+        } else {
+          const scrollTop = chatBox.scrollTop + 102;
+          //获取倒数第二条消息
+          const index = msgs.length >= 2 ? msgs.length - 2 : 0;
+          const messageElement = document.getElementById(`message-${msgs[index].id}`);
+          console.log('messageElement')
+          if (messageElement) {
+            const middleOffsetTop = messageElement.offsetTop + messageElement.clientHeight / 2;
+            console.log('middleOffsetTop', middleOffsetTop, 'scrollTop', scrollTop, 'chatBox.clientHeight', chatBox.clientHeight)
+            if (middleOffsetTop >= scrollTop && middleOffsetTop <= scrollTop + chatBox.clientHeight) {
+              this.scrollToBottom()
+            }
+          }
+        }
+      })
     }
   }
 }
