@@ -52,6 +52,8 @@ const actions = {
                             }
                         }else if(message.operate == that._vm._const.OperateQuitRoom){
                             that.state.chat.currentChat.users = that.state.chat.currentChat.users.filter(obj => obj.id != message.sender_id);
+                        }else if(message.operate == that._vm._const.OperateDeleteRoom){
+                            that.state.chat.currentChat = {};
                         }
                     }
                 }else{
@@ -67,6 +69,12 @@ const actions = {
                     if(!exists){
                         that.state.chat.currentMsgs.push(message)
                     }
+                }
+            }
+            if(message.msg_type == that._vm._const.TypeNotice){
+                if(message.operate == that._vm._const.OperateDeleteRoom){
+                    that.state.chat.chats = that.state.chat.chats.filter(obj => obj.id != message.receiver_id);
+                    that.state.room.rooms = that.state.room.rooms.filter(obj => obj.id != message.receiver_id);
                 }
             }
         };

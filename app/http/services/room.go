@@ -151,6 +151,9 @@ func (s *RoomService) Quit(c *gin.Context, id uint64) *common.CodeErr {
 		err     error
 		room    models.Room
 		message models.Message
+
+		operate     string = models.OperateQuitRoom
+		operateText string = "退出"
 	)
 	if err = db.G_DB.Limit(1).Find(&room, id).Error; err != nil {
 		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
@@ -158,19 +161,25 @@ func (s *RoomService) Quit(c *gin.Context, id uint64) *common.CodeErr {
 	if room.ID == 0 {
 		return common.NewCodeErr(common.StatusNotFound, common.ERR_NOT_FOUND)
 	}
+	//如果房主解散聊天室的话，保留用户和聊天室的关联关系，只删除房间
 	if room.Owner == auth.User(c).ID {
-		return common.NewCodeErr(common.StatusInvalidArgument, errors.New("房主暂不支持退出聊天室"))
-	}
-	if db.G_DB.Model(auth.User(c)).Association("Rooms").Delete(room) != nil {
-		return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+		if db.G_DB.Delete(&room).Error != nil {
+			return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+		}
+		operate = models.OperateDeleteRoom
+		operateText = "解散"
+	} else {
+		if db.G_DB.Model(auth.User(c)).Association("Rooms").Delete(room) != nil {
+			return common.NewCodeErr(common.StatusInternal, common.ERR_INTERNAL_SERVER)
+		}
 	}
 	message = models.Message{
 		ChatType:   models.ChatType(2),
 		MsgType:    models.MsgType(1),
 		SenderID:   auth.User(c).ID,
 		ReceiverID: room.ID,
-		Content:    fmt.Sprintf("【%s】退出了聊天室", auth.User(c).Name),
-		Operate:    models.OperateQuitRoom,
+		Content:    fmt.Sprintf("【%s】%s了聊天室", auth.User(c).Name, operateText),
+		Operate:    operate,
 	}
 	if db.G_DB.Create(&message).Error != nil {
 		common.RespFail(c, common.StatusInternal, common.ERR_INTERNAL_SERVER)

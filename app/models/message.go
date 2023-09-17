@@ -24,6 +24,7 @@ const TypeShare MsgType = 9
 const OperateCreateRoom = "create_room"
 const OperateJoinRoom = "join_room"
 const OperateQuitRoom = "quit_room"
+const OperateDeleteRoom = "delete_room"
 
 type Message struct {
 	base.BaseIDModel

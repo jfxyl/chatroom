@@ -17,6 +17,7 @@ type Chat struct {
 	Name        string         `json:"name"`
 	Alias       string         `json:"alias"`
 	Avatar      string         `json:"avatar"`
+	Owner       uint64         `json:"owner"`
 	CreatedAt   string         `json:"created_at"`
 	UnreadCount uint64         `json:"unread_count"`
 	Users       []*models.User `json:"users"`

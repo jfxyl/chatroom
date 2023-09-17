@@ -6,7 +6,7 @@
         <div class="left-container">
           <div class="title">来聊天吧</div>
           <span class="sub_title">可爱的人儿呢</span>
-          <img class="intro-image" src="https://web.rentsoft.cn/static/media/login_bg.e42640a5.png">
+          <img class="intro-image" src="http://jfxy.oss-cn-nanjing.aliyuncs.com/chatroom/static/login-background.png">
         </div>
         <LoginPanel v-if="action == 'login'" @jump="action = $event"></LoginPanel>
         <RegisterPanel v-else-if="action == 'register'" @jump="action = $event"></RegisterPanel>

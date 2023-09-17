@@ -166,7 +166,7 @@
         </div>
         <div class="item footer">
           <a-button type="danger" ghost @click="quitRoom(currentChat)">
-            退出聊天室
+            {{currentChat.owner == userInfo.id ? '解散' : '退出'}}聊天室
           </a-button>
         </div>
       </div>
@@ -365,7 +365,7 @@ export default {
     quitRoom(room) {
       let that = this
       Modal.confirm({
-        title: '确定退出聊天室么?',
+        title: `确定${this.currentChat.owner == this.userInfo.id ? '解散' : '退出'}聊天室么?`,
         okText: '确定',
         cancelText: '取消',
         onOk() {

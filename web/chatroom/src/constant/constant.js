@@ -11,6 +11,7 @@ const TypeShare  = 9
 const OperateCreateRoom = "create_room"
 const OperateJoinRoom = "join_room"
 const OperateQuitRoom = "quit_room"
+const OperateDeleteRoom = "delete_room"
 
 export default{
     TypeNotice,
@@ -25,5 +26,6 @@ export default{
 
     OperateCreateRoom,
     OperateJoinRoom,
-    OperateQuitRoom
+    OperateQuitRoom,
+    OperateDeleteRoom
 }

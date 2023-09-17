@@ -44,15 +44,18 @@ func (s *ChatService) List(c *gin.Context) ([]*common.Chat, *common.CodeErr) {
 		fmt.Println(result)
 	}
 	for _, v := range user.UserRooms {
-		chats = append(chats, &common.Chat{
-			ID:          v.Room.ID,
-			Name:        v.Room.Name,
-			Alias:       v.Alias,
-			Avatar:      v.Room.Avatar,
-			CreatedAt:   v.Room.CreatedAt.Format("2006-01-02 15:04:05"),
-			Users:       v.Room.Users,
-			UnreadCount: resultMap[v.Room.ID],
-		})
+		if v.Room != nil {
+			chats = append(chats, &common.Chat{
+				ID:          v.Room.ID,
+				Name:        v.Room.Name,
+				Alias:       v.Alias,
+				Avatar:      v.Room.Avatar,
+				CreatedAt:   v.Room.CreatedAt.Format("2006-01-02 15:04:05"),
+				Users:       v.Room.Users,
+				UnreadCount: resultMap[v.Room.ID],
+				Owner:       v.Room.Owner,
+			})
+		}
 	}
 	return chats, nil
 }
