@@ -3,6 +3,9 @@ version: '3.8'
 networks:
   chatroom:
 
+volumes:
+  mysqldata:
+
 services:
   mysql:
     image: mysql:5.7
@@ -18,7 +21,7 @@ services:
       '--collation-server=utf8mb4_general_ci',
     ]
     volumes:
-      - E:\Docker\mysql5.7\data:/var/lib/mysql
+      - mysqldata:/var/lib/mysql
     ports:
       - "3307:3306"
 
