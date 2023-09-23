@@ -10,7 +10,6 @@ RUN npm install
 
 RUN npm run build
 
-
 FROM golang:1.19-alpine3.18 AS builder
 
 RUN go env -w GO111MODULE=on
@@ -26,8 +25,7 @@ RUN go install ./...
 FROM alpine:3.18
 
 COPY --from=builder /go/bin/chatroom /bin/chatroom/chatroom
-COPY --from=builder /go/src/chatroom/config.pro.yaml /bin/chatroom/config.yaml
-
+COPY --from=builder /go/src/chatroom/config.yaml /bin/chatroom/config.yaml
 
 EXPOSE 8080
 
