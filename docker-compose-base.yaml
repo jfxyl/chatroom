@@ -47,3 +47,13 @@ services:
       - "10911:10911"
     command: sh mqbroker -n chatroom-rocketmq-namesrv:9876
 
+  rocketmq-console:
+    image: styletang/rocketmq-console-ng:1.0.0
+    container_name: chatroom-rocketmq-console
+    restart: always
+    networks:
+      - chatroom
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=chatroom-rocketmq-namesrv:9876"
+    ports:
+      - "8080:8080"

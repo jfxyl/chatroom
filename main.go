@@ -25,5 +25,7 @@ func main() {
 	//初始化路由、http服务
 	r = gin.Default()
 	routes.InitRouter(r, publicFS)
-	r.Run(fmt.Sprintf(":%d", config.G_Config.Port))
+	if err = r.Run(fmt.Sprintf(":%d", config.G_Config.Port)); err != nil {
+		log.Fatalln(err)
+	}
 }
