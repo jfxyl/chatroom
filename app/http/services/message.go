@@ -19,11 +19,6 @@ func NewMessageService() *MessageService {
 	}
 }
 
-var (
-	messageTopic = "message"
-	readTopic    = "read"
-)
-
 type MessageService struct {
 	readChan       chan *common.ReadBody
 	AutoCommitChan chan *common.ReadBodyBatch
@@ -37,7 +32,7 @@ func (s *MessageService) PushMessage(message *models.Message) (err error) {
 	)
 	//发送同步消息
 	msg, err = json.Marshal(message)
-	err = s.Push(messageTopic, msg)
+	err = s.Push(common.MessageTopic, msg)
 	return
 }
 
@@ -47,7 +42,7 @@ func (s *MessageService) PushRead(readbody *common.ReadBody) (err error) {
 	)
 	//发送同步消息
 	msg, err = json.Marshal(readbody)
-	err = s.Push(readTopic, msg)
+	err = s.Push(common.ReadTopic, msg)
 	return
 }
 

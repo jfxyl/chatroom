@@ -34,7 +34,9 @@ func BootStrap() (err error) {
 	fmt.Println("初始化mq成功")
 	mgr.InitWsMgr()
 	fmt.Println("初始化ws mgr成功")
-	mgr.InitMessageMgr()
+	if err = mgr.InitMessageMgr(); err != nil {
+		return
+	}
 	fmt.Println("初始化message mgr成功")
 	return
 }

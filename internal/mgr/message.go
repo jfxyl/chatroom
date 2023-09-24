@@ -18,12 +18,15 @@ var (
 	G_MessageMgr *MessageMgr
 )
 
-func InitMessageMgr() {
+func InitMessageMgr() (err error) {
 	G_MessageMgr = &MessageMgr{
 		readChan:       make(chan *common.ReadBody, 1000),
 		AutoCommitChan: make(chan *common.ReadBodyBatch, 1000),
 	}
-	go G_MessageMgr.Pull()
+	if err := G_MessageMgr.Pull(); err != nil {
+		return err
+	}
+	return
 }
 
 type MessageMgr struct {
@@ -39,13 +42,12 @@ func (m *MessageMgr) Push(topic string, msg []byte) (err error) {
 	return
 }
 
-func (m *MessageMgr) Pull() {
+func (m *MessageMgr) Pull() (err error) {
 	var (
-		err     error
 		message models.Message
 	)
 	fmt.Println("Pull")
-	mq.G_PushConsumer.Subscribe("message", consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+	err = mq.G_PushConsumer.Subscribe("message", consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 		for _, msg := range msgs {
 			if json.Unmarshal(msg.Body, &message) != nil {
 				continue
@@ -57,9 +59,12 @@ func (m *MessageMgr) Pull() {
 		}
 		return consumer.ConsumeSuccess, nil
 	})
+	if err != nil {
+		return err
+	}
 
 	//已读信号积攒满一定数量或者一定时间后，发送已读信号
-	mq.G_PushConsumer.Subscribe("read", consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+	err = mq.G_PushConsumer.Subscribe("read", consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 		for _, msg := range msgs {
 			var (
 				readBody common.ReadBody
@@ -73,17 +78,16 @@ func (m *MessageMgr) Pull() {
 		}
 		return consumer.ConsumeSuccess, nil
 	})
-
-	go m.ReadDelayLoop()
+	if err != nil {
+		return err
+	}
 
 	if err = mq.G_PushConsumer.Start(); err != nil {
-		fmt.Println(err)
+		return err
 	}
 
-	defer mq.G_PushConsumer.Shutdown()
-	for {
-		time.Sleep(1 * time.Second)
-	}
+	go m.ReadDelayLoop()
+	return
 }
 
 func (m *MessageMgr) SendReadInfo(msg models.Message) (err error) {

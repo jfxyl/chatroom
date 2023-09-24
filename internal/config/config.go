@@ -20,7 +20,8 @@ type mysqlConfig struct {
 }
 
 type rocketmqConfig struct {
-	Endpoints []string `mapstructure:"endpoints"`
+	Endpoints  []string `mapstructure:"endpoints"`
+	BrokerAddr string   `mapstructure:"brokeraddr"`
 }
 
 type ossConfig struct {
@@ -72,7 +73,7 @@ func InitConfig() (err error) {
 	return
 }
 
-//读取配置文件
+// 读取配置文件
 func readConfig(v *viper.Viper) (err error) {
 	var (
 		config config

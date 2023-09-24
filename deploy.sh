@@ -6,5 +6,6 @@
 docker-compose -f docker-compose-base.yaml  up --build -d
 
 chmod +x ./replace-ip.sh && ./replace-ip.sh chatroom-rocketmq-namesrv ./config.pro.yaml ./config.yaml
+chmod +x ./replace-ip.sh && ./replace-ip.sh chatroom-rocketmq-broker ./config.pro.yaml ./config.yaml
 
 docker-compose -f docker-compose-myapp.yaml  up --build -d

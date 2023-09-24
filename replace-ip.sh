@@ -26,7 +26,10 @@ CONFIG_NEW_PATH="$3"
 IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER_NAME")
 
 #copy一个新配置文件
-cp $CONFIG_OLD_PATH $CONFIG_NEW_PATH
+
+if [ ! -f "$CONFIG_NEW_PATH" ]; then
+    cp "$CONFIG_OLD_PATH" "$CONFIG_NEW_PATH"
+fi
 
 echo $CONTAINER_NAME
 echo $CONFIG_OLD_PATH
