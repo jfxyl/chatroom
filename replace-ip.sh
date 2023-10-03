@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # 检查是否传递了容器名称作为参数
 if [ -z "$1" ]; then
@@ -23,8 +23,10 @@ CONFIG_OLD_PATH="$2"
 # 新配置文件
 CONFIG_NEW_PATH="$3"
 # 获取容器的 IP 地址
-IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER_NAME")
 
+IP=$(getent hosts $CONTAINER_NAME | awk '{ print $1 }')
+
+echo $IP
 #copy一个新配置文件
 
 if [ ! -f "$CONFIG_NEW_PATH" ]; then

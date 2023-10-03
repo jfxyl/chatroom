@@ -18,15 +18,17 @@ RUN go env -w GOPROXY=https://goproxy.cn,direct
 COPY . /go/src/chatroom
 COPY --from=web-builder /web/chatroom/dist /go/src/chatroom/public
 
+RUN chmod +x /go/src/chatroom/replace-ip.sh
+
 WORKDIR /go/src/chatroom
 
 RUN go install ./...
 
 FROM alpine:3.18
 
+COPY --from=builder /go/src/chatroom/replace-ip.sh /bin/chatroom/replace-ip.sh
+COPY --from=builder /go/src/chatroom/deploy.sh /bin/chatroom/deploy.sh
+COPY --from=builder /go/src/chatroom/config.pro.yaml /bin/chatroom/config.pro.yaml
 COPY --from=builder /go/bin/chatroom /bin/chatroom/chatroom
-COPY --from=builder /go/src/chatroom/config.yaml /bin/chatroom/config.yaml
 
 EXPOSE 8080
-
-ENTRYPOINT [ "/bin/chatroom/chatroom","--config=/bin/chatroom/config.yaml" ]
