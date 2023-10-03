@@ -7,7 +7,6 @@
     <a-form :form="form" layout="vertical" @submit="handleSubmit">
       <a-form-item label="用户名">
         <a-input
-            class="ant-input-sm"
             placeholder="请输入用户名"
             allow-clear
             v-decorator="[
@@ -18,7 +17,6 @@
       </a-form-item>
       <a-form-item label="密码">
         <a-input
-            class="ant-input-sm"
             placeholder="请输入密码"
             type="password"
             allow-clear
@@ -30,7 +28,6 @@
       </a-form-item>
       <a-form-item label="确认密码">
         <a-input
-            class="ant-input-sm"
             placeholder="请输入密码"
             type="password"
             allow-clear
@@ -88,6 +85,7 @@ export default {
                   formErrorPrompt(that.form,form,data.data.msg)
                 }else{
                   message.success('注册成功');
+                  that.$emit('jump', 'login')
                 }
               })
         }

@@ -471,7 +471,6 @@ export default {
     handleClickOut:function () {
       this.emojiVisible = false
       // this.settingVisible = false
-      console.log(11111)
     },
     sendMsg(){
       if(this.msg.length > 0){
@@ -507,6 +506,7 @@ export default {
       })
     },
     chooseFile(){
+      message.warning('暂不支持');
       // let _this = this
       // remote.dialog.showOpenDialog({
       //   properties: ['openFile']
