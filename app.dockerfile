@@ -30,5 +30,4 @@ COPY --from=builder /go/src/chatroom/replace-ip.sh /bin/chatroom/replace-ip.sh
 COPY --from=builder /go/src/chatroom/deploy.sh /bin/chatroom/deploy.sh
 COPY --from=builder /go/src/chatroom/config.pro.yaml /bin/chatroom/config.pro.yaml
 COPY --from=builder /go/bin/chatroom /bin/chatroom/chatroom
-
-EXPOSE 8080
+RUN chmod +x /bin/chatroom/deploy.sh
