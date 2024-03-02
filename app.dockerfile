@@ -4,7 +4,7 @@ COPY ./web/chatroom /web/chatroom
 
 WORKDIR /web/chatroom
 
-RUN npm config set registry https://registry.npm.taobao.org
+RUN npm config set registry https://registry.npmmirror.com
 
 RUN npm install
 

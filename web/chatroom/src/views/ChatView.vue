@@ -1,7 +1,11 @@
 <template>
   <div class="container">
-    <ChatsPanel></ChatsPanel>
-    <ChatPanel></ChatPanel>
+    <keep-alive>
+      <ChatsPanel></ChatsPanel>
+    </keep-alive>
+    <keep-alive>
+      <ChatPanel></ChatPanel>
+    </keep-alive>
   </div>
 </template>
 

@@ -308,6 +308,15 @@ export default {
           this.loadMore();
       }
     })
+    this.$nextTick(() => {
+      console.log('scrollToBottom')
+      const chatBox = document.getElementById('chat-box');
+      if(chatBox.scrollHeight <= chatBox.clientHeight){
+        this.handleChatBoxRead()
+      }else{
+        this.scrollToBottom()
+      }
+    })
   },
   computed:{
     currentChat(){

@@ -107,6 +107,9 @@ const actions = {
     },
     async SET_CURRENT_CHAT(context, chat) {
         try {
+            if(state.currentChat.id == chat.id){
+                return
+            }
             context.commit('SET_HAVE_MORE_MSG', true);
             await this.dispatch('GET_CHAT_MESSAGE', chat);
             context.commit('SET_CURRENT_CHAT', chat);
